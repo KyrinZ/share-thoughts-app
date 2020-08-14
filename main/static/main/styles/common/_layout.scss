@@ -1,0 +1,106 @@
+.home-bkg-img {
+  @include background-img("../images/home.svg", #e1ffe5);
+  @extend %extend-background;
+}
+.post-bkg-img {
+  @include background-img("../images/post.svg", #e1ffe5);
+  @extend %extend-background;
+}
+
+.about-bkg-img {
+  @include background-img("../images/about.svg", #e1ffe5);
+  @extend %extend-background;
+}
+.profile-bkg-img {
+  @include background-img("../images/profile.svg", #ffe1e1);
+  @extend %extend-background;
+}
+
+.header {
+  z-index: 1;
+  position: sticky;
+  top: 0;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: $box-shadow;
+  background: linear-gradient(269.28deg, #42c796 8.14%, #81f390 98.56%);
+  img {
+    width: 50%;
+    margin-left: 2em;
+    transition: transform 0.5s;
+    &:hover {
+      transform: scale(1.03);
+    }
+  }
+
+  .navbar {
+    margin-right: 2em;
+
+    a {
+      margin: 0 2em;
+      color: white;
+      &:hover {
+        color: $button-color-green;
+      }
+    }
+  }
+}
+
+.header-red {
+  z-index: 1;
+  background: linear-gradient(269.62deg, #e92b2b -19.66%, #f7ab53 111.57%);
+  .navbar-red {
+    a {
+      color: white;
+      &:hover {
+        color: $button-color-red;
+      }
+    }
+  }
+}
+
+.main-container {
+  width: 80%;
+  margin: auto;
+}
+
+.messages {
+  text-align: center;
+  padding: 1em;
+  margin: 0.5em 0;
+  background-color: #81f3907c;
+  color: green;
+}
+
+.msg-orange {
+  background-color: #e2d34b7c;
+  color: rgb(129, 100, 21);
+}
+.msg-red {
+  background-color: #e2694b7c;
+  color: rgb(129, 21, 21);
+}
+
+.profile-pic {
+  height: 8rem;
+  width: 8rem;
+  margin: auto;
+  border-radius: 100%;
+  border: 0.2rem solid white;
+  overflow: hidden;
+  box-shadow: $box-shadow;
+}
+
+.error-page {
+  background-color: $background-div-red;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  width: 20%;
+  border-radius: 2em;
+  text-align: center;
+  a {
+    @extend %anchor-red;
+  }
+}

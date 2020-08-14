@@ -1,0 +1,922 @@
+button, input {
+  width: 100%;
+  padding: 0.5em 1em;
+  margin: 0.2em 0;
+  border-radius: 2em;
+}
+
+.form form, .sidebar, .all-posts .adding-posts form textarea, .post, .post .post-comment, .first-container, .first-container .second-container, .info .profile-settings, .info .change-password, .user-posts, .main .description {
+  padding: 2em;
+  margin: 0.5em;
+  border-radius: 2em;
+  -webkit-box-shadow: 0px 13px 22px rgba(0, 0, 0, 0.15);
+          box-shadow: 0px 13px 22px rgba(0, 0, 0, 0.15);
+  background-color: #c9f8cfd3;
+}
+
+.home-bkg-img, .post-bkg-img, .about-bkg-img, .profile-bkg-img {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+}
+
+.error-page a, .info .profile-settings a, .info .change-password a, .post-red .post-buttonsAndstatus-red a {
+  color: #c27a7a;
+}
+
+.error-page a:hover, .info .profile-settings a:hover, .info .change-password a:hover, .post-red .post-buttonsAndstatus-red a:hover {
+  color: #b92626;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.97rem;
+}
+
+a {
+  cursor: pointer;
+  color: #7abb84;
+  text-decoration: none;
+  -webkit-transition: color 0.5s;
+  transition: color 0.5s;
+}
+
+a:hover {
+  color: #26712f;
+}
+
+button {
+  cursor: pointer;
+  color: white;
+  background-color: #26712f;
+  font-size: 1.3rem;
+  -webkit-box-shadow: 0px 13px 22px rgba(0, 0, 0, 0.15);
+          box-shadow: 0px 13px 22px rgba(0, 0, 0, 0.15);
+  border: none;
+  -webkit-transition: color 0.5s, background-color 0.5s;
+  transition: color 0.5s, background-color 0.5s;
+}
+
+button:hover {
+  color: #26712f;
+  background-color: #d0ffd5;
+}
+
+input {
+  border: 0.1em solid #26712f;
+}
+
+ul,
+ol {
+  list-style-type: none;
+}
+
+.home-bkg-img {
+  background-image: url("../images/home.svg");
+  background-color: #e1ffe5;
+  background-size: cover;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.post-bkg-img {
+  background-image: url("../images/post.svg");
+  background-color: #e1ffe5;
+  background-size: cover;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.about-bkg-img {
+  background-image: url("../images/about.svg");
+  background-color: #e1ffe5;
+  background-size: cover;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.profile-bkg-img {
+  background-image: url("../images/profile.svg");
+  background-color: #ffe1e1;
+  background-size: cover;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.header {
+  z-index: 1;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-shadow: 0px 13px 22px rgba(0, 0, 0, 0.15);
+          box-shadow: 0px 13px 22px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(269.28deg, #42c796 8.14%, #81f390 98.56%);
+}
+
+.header img {
+  width: 50%;
+  margin-left: 2em;
+  -webkit-transition: -webkit-transform 0.5s;
+  transition: -webkit-transform 0.5s;
+  transition: transform 0.5s;
+  transition: transform 0.5s, -webkit-transform 0.5s;
+}
+
+.header img:hover {
+  -webkit-transform: scale(1.03);
+          transform: scale(1.03);
+}
+
+.header .navbar {
+  margin-right: 2em;
+}
+
+.header .navbar a {
+  margin: 0 2em;
+  color: white;
+}
+
+.header .navbar a:hover {
+  color: #26712f;
+}
+
+.header-red {
+  z-index: 1;
+  background: linear-gradient(269.62deg, #e92b2b -19.66%, #f7ab53 111.57%);
+}
+
+.header-red .navbar-red a {
+  color: white;
+}
+
+.header-red .navbar-red a:hover {
+  color: #b92626;
+}
+
+.main-container {
+  width: 80%;
+  margin: auto;
+}
+
+.messages {
+  text-align: center;
+  padding: 1em;
+  margin: 0.5em 0;
+  background-color: #81f3907c;
+  color: green;
+}
+
+.msg-orange {
+  background-color: #e2d34b7c;
+  color: #816415;
+}
+
+.msg-red {
+  background-color: #e2694b7c;
+  color: #811515;
+}
+
+.profile-pic {
+  height: 8rem;
+  width: 8rem;
+  margin: auto;
+  border-radius: 100%;
+  border: 0.2rem solid white;
+  overflow: hidden;
+  -webkit-box-shadow: 0px 13px 22px rgba(0, 0, 0, 0.15);
+          box-shadow: 0px 13px 22px rgba(0, 0, 0, 0.15);
+}
+
+.error-page {
+  background-color: #ffdfbae0;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  width: 20%;
+  border-radius: 2em;
+  text-align: center;
+}
+
+.container {
+  height: 100vh;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.container .left-empty-block {
+  height: 100%;
+}
+
+.login-background {
+  background-image: url("../images/login-background.svg");
+  background-color: #e1ffe5;
+  background-size: cover;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.form {
+  text-align: center;
+  width: 50%;
+}
+
+.form img {
+  width: 100%;
+  margin-left: -1.5em;
+}
+
+.form form {
+  width: 100%;
+  color: #26712f;
+  -webkit-transition: -webkit-transform 2s ease-out;
+  transition: -webkit-transform 2s ease-out;
+  transition: transform 2s ease-out;
+  transition: transform 2s ease-out, -webkit-transform 2s ease-out;
+}
+
+.form form .form-itm {
+  font-size: 0.8rem;
+  text-align: start;
+  margin-top: 0.5em;
+}
+
+.form form .form-itm input {
+  font-size: 0.98rem;
+  background: none;
+}
+
+.form form a {
+  margin-top: 0.5em;
+  display: block;
+}
+
+.form form:hover {
+  -webkit-transform: scale(1.03);
+          transform: scale(1.03);
+}
+
+.errors {
+  color: red;
+  font-size: 0.7rem;
+}
+
+.register-background {
+  background-image: url("../images/register-background.svg");
+  background-color: #ffedd9;
+  background-size: cover;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.register-form form {
+  color: #b92626;
+  background-color: #ffdfbae0;
+}
+
+.register-form form input {
+  border: 0.1em solid #b92626;
+}
+
+.register-form form button {
+  background-color: #b92626;
+}
+
+.register-form form button:hover {
+  color: #b92626;
+  background-color: #ffebeb;
+}
+
+.register-form form a {
+  color: #c27a7a;
+}
+
+.register-form form a:hover {
+  color: #b92626;
+}
+
+.grid-container {
+  margin: 0.5em 0;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 3fr 1fr;
+      grid-template-columns: 3fr 1fr;
+      grid-template-areas: "posts sidebar";
+  grid-column-gap: 1em;
+}
+
+.sidebar {
+  -ms-grid-row: 1;
+  -ms-grid-column: 2;
+  grid-area: sidebar;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 15em;
+  background-color: #ddfde1;
+}
+
+.all-posts {
+  -ms-grid-row: 1;
+  -ms-grid-column: 1;
+  grid-area: posts;
+}
+
+.all-posts .adding-posts {
+  text-align: center;
+}
+
+.all-posts .adding-posts button {
+  width: 50%;
+}
+
+.all-posts .adding-posts form textarea {
+  background-color: white;
+  width: 100%;
+  border: none;
+  resize: none;
+}
+
+.all-posts .adding-posts form input {
+  margin: 0;
+  border: none;
+  cursor: pointer;
+}
+
+.post .post-profile-pic, .post .post-comment .comment-profile-pic {
+  display: inline-block;
+  height: 4rem;
+  width: 4rem;
+  overflow: hidden;
+  border-radius: 100%;
+}
+
+.post .post-profile-pic img, .post .post-comment .comment-profile-pic img {
+  width: 100%;
+}
+
+.post h4 {
+  display: inline;
+  margin-left: 0.5em;
+  font-size: 1.5rem;
+  color: #26712f;
+}
+
+.post h4 span {
+  margin-left: 0.5em;
+  color: gray;
+  font-size: 0.7rem;
+}
+
+.post p {
+  margin: 0.5em 0;
+  line-height: 1.4em;
+}
+
+.post .post-comment {
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  background-color: white;
+  border-radius: 1em;
+  padding: 1em;
+}
+
+.post .post-comment .comment-profile-pic {
+  height: 3rem;
+  width: 3rem;
+}
+
+.post .post-comment h5 {
+  font-size: 1.1rem;
+  color: #4fac5a;
+}
+
+.post .post-comment h5 span {
+  margin-left: 0.5em;
+  color: gray;
+  font-size: 0.7rem;
+}
+
+.post .post-comment p {
+  font-size: 0.85rem;
+}
+
+.post .post-buttonsAndstatus {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.post .post-buttonsAndstatus .post-status h5 {
+  color: #26712f;
+  font-weight: 300;
+  font-size: 0.99rem;
+}
+
+.post .post-buttonsAndstatus .post-status h5 span {
+  color: black;
+  font-weight: bold;
+  margin: 0 0.1em;
+}
+
+.post .post-buttonsAndstatus .post-comment-btns {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.post .post-buttonsAndstatus .post-comment-btns button {
+  font-size: 1rem;
+  margin: 0.5em;
+  color: #4d4d4d;
+  background-color: #d0ffd5;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+}
+
+.post .post-buttonsAndstatus .post-comment-btns button:hover {
+  color: white;
+  background-color: #698f6d;
+}
+
+.post .post-buttonsAndstatus .post-comment-btns .liked {
+  background-color: #82e5f7;
+}
+
+.post .post-buttonsAndstatus .post-comment-btns .liked:hover {
+  background-color: #3a595f;
+}
+
+#head {
+  -webkit-transition: -webkit-transform 0.5s;
+  transition: -webkit-transform 0.5s;
+  transition: transform 0.5s;
+  transition: transform 0.5s, -webkit-transform 0.5s;
+}
+
+#head:hover {
+  -webkit-transform: scale(1.03);
+          transform: scale(1.03);
+}
+
+.post .comment-profile-fit img {
+  width: 5%;
+}
+
+.post .comment-profile-fit h5 {
+  display: inline;
+  margin-left: 0.5em;
+}
+
+.adding-comment {
+  text-align: center;
+}
+
+.adding-comment form textarea {
+  margin: 0.5em 0;
+  padding: 1em;
+  border-radius: 0.5em;
+  width: 100%;
+  border: none;
+  resize: none;
+}
+
+.adding-comment form button {
+  width: 50%;
+}
+
+.first-container {
+  text-align: center;
+  margin-top: 3em;
+  background-color: #c9f8e8a8;
+}
+
+.first-container .second-container {
+  line-height: 1.5rem;
+}
+
+.Profile {
+  margin-top: 1em;
+  text-align: center;
+}
+
+.Profile img {
+  width: 100%;
+}
+
+.Profile h1 {
+  color: #b92626;
+  margin: 0;
+}
+
+.Profile h2 {
+  font-size: 1.2rem;
+  color: #f8d2d2;
+}
+
+.errors {
+  color: red;
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.info {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.info .profile-settings, .info .change-password {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  background-color: #ffdfbae0;
+}
+
+.info .profile-settings form, .info .change-password form {
+  margin-top: 0.5em;
+  font-size: 0.8rem;
+}
+
+.info .profile-settings form input, .info .change-password form input {
+  border: #b92626 0.1em solid;
+}
+
+.info .profile-settings form .bool input, .info .change-password form .bool input {
+  width: auto;
+}
+
+.info .profile-settings form button, .info .change-password form button {
+  background-color: #b92626;
+}
+
+.info .profile-settings form button:hover, .info .change-password form button:hover {
+  color: #b92626;
+  background-color: #ffebeb;
+}
+
+.info .change-password {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+.user-posts {
+  background-color: #ffdfba9a;
+}
+
+.user-posts .heading {
+  text-align: center;
+  color: #b92626;
+}
+
+.post-red {
+  background-color: #ffdfbae0;
+}
+
+.post-red .delete {
+  float: right;
+  padding: 0.3em;
+  font-size: 0.8rem;
+  color: white;
+  background-color: red;
+  border-radius: 0.5em;
+}
+
+.post-red .delete:hover {
+  color: red;
+  background-color: #ffd9d9;
+}
+
+.post-red .post-buttonsAndstatus-red .post-status-red h5 {
+  color: #b92626;
+}
+
+.post-red .post-buttonsAndstatus-red .post-comment-btns-red button {
+  color: #4d4d4d;
+  background-color: #ffdbd0;
+}
+
+.post-red .post-buttonsAndstatus-red .post-comment-btns-red button:hover {
+  color: white;
+  background-color: #8f6c69;
+}
+
+.main {
+  text-align: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main .logo-landing {
+  margin-top: 4rem;
+  margin-left: -2rem;
+  -webkit-animation: slide-top 2s both;
+          animation: slide-top 2s both;
+}
+
+.main .logo-landing img {
+  width: 30%;
+}
+
+.main .description {
+  -webkit-animation: slide-top 2s both;
+          animation: slide-top 2s both;
+  -webkit-animation-delay: 3s;
+          animation-delay: 3s;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  background-color: #ffdfbae0;
+  font-size: 0.85rem;
+  line-height: 1.1rem;
+  width: 30%;
+  margin: 1rem auto auto auto;
+}
+
+.main .buttons-landing {
+  margin: 6rem auto;
+}
+
+.main .buttons-landing button {
+  font-size: 1rem;
+  padding: 1rem 6rem;
+  width: auto;
+}
+
+.main .footer-background {
+  position: fixed;
+  bottom: 0;
+  z-index: -1;
+  width: 100%;
+  -webkit-box-shadow: 0px 13px 22px rgba(0, 0, 0, 0.15);
+          box-shadow: 0px 13px 22px rgba(0, 0, 0, 0.15);
+}
+
+#log-in {
+  border: 0.1rem solid #b92626;
+  background-color: white;
+  color: #b92626;
+  -webkit-transition: -webkit-transform ease 0.3s;
+  transition: -webkit-transform ease 0.3s;
+  transition: transform ease 0.3s;
+  transition: transform ease 0.3s, -webkit-transform ease 0.3s;
+}
+
+#log-in:hover {
+  -webkit-transform: scale(1.05);
+          transform: scale(1.05);
+  background-color: #f8e5e5;
+}
+
+#register {
+  background-color: #b92626;
+  color: white;
+  -webkit-transition: -webkit-transform ease 0.3s;
+  transition: -webkit-transform ease 0.3s;
+  transition: transform ease 0.3s;
+  transition: transform ease 0.3s, -webkit-transform ease 0.3s;
+}
+
+#register:hover {
+  -webkit-transform: scale(1.05);
+          transform: scale(1.05);
+  color: #b92626;
+  background-color: #ffebeb;
+}
+
+.background-color {
+  background-color: #fff5f5;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  z-index: -2;
+}
+
+@-webkit-keyframes slide-top {
+  0% {
+    -webkit-transform: translateY(100px);
+            transform: translateY(100px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+    opacity: 100%;
+  }
+}
+
+@keyframes slide-top {
+  0% {
+    -webkit-transform: translateY(100px);
+            transform: translateY(100px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+    opacity: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    -ms-grid-columns: 1fr;
+        grid-template-columns: 1fr;
+  }
+  .container .left-empty-block {
+    display: none;
+  }
+  .login-mb-bkg {
+    background-image: url("../images/mb-login-bkg.svg");
+    background-color: #e1ffe5;
+    background-size: cover;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    z-index: -1;
+  }
+  .register-mb-bkg {
+    background-image: url("../images/mb-register-bkg.svg");
+    background-color: #ffe3e1;
+    background-size: cover;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    z-index: -1;
+  }
+  .form {
+    text-align: center;
+    width: 80%;
+    margin: auto;
+  }
+  .header {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    text-align: center;
+  }
+  .header img {
+    margin-left: 0;
+  }
+  .header .navbar {
+    margin-right: 0;
+  }
+  .header .navbar a {
+    margin: 1em;
+    display: inline-block;
+  }
+  .main-container {
+    width: 90%;
+  }
+  .grid-container {
+    margin: 1em 0;
+    -ms-grid-columns: 1fr;
+        grid-template-columns: 1fr;
+        grid-template-areas: "sidebar" "posts";
+  }
+  .all-posts .adding-posts button {
+    font-size: 1.1rem;
+    width: 100%;
+  }
+  .all-posts .adding-posts form textarea {
+    margin: 0.5em 0;
+  }
+  .post .post-buttonsAndstatus {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+  }
+  .post .post-buttonsAndstatus .post-status h5 {
+    margin-top: 1em;
+  }
+  .post .post-buttonsAndstatus a {
+    margin-top: 1em;
+  }
+  .post .post-buttonsAndstatus .post-comment-btns button {
+    margin: 0.5em;
+  }
+  .info {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
+  }
+  .main .logo-landing {
+    margin-top: 2rem;
+  }
+  .main .logo-landing img {
+    width: 60%;
+  }
+  .main .description {
+    font-size: 0.85rem;
+    line-height: 1.1rem;
+    width: 80%;
+  }
+  .main .buttons-landing {
+    width: 80%;
+    margin: 4rem auto;
+  }
+  #log-in {
+    border: 0.1rem solid #b92626;
+    background-color: white;
+    color: #b92626;
+  }
+  #log-in:hover {
+    background-color: #e9e9e9;
+  }
+  #register {
+    background-color: #b92626;
+    color: white;
+  }
+  #register:hover {
+    color: #b92626;
+    background-color: #ffebeb;
+  }
+}
+
+#Post-form, #profile-settings-form, #password-form {
+  overflow: hidden;
+  -webkit-transform: scaleY(0);
+          transform: scaleY(0);
+  -webkit-transform-origin: top;
+          transform-origin: top;
+  height: 0px;
+  -webkit-transition: height 0.3s ease-out, -webkit-transform 0.3s;
+  transition: height 0.3s ease-out, -webkit-transform 0.3s;
+  transition: transform 0.3s, height 0.3s ease-out;
+  transition: transform 0.3s, height 0.3s ease-out, -webkit-transform 0.3s;
+}
+
+#Post {
+  -webkit-transition: font-size 0.3s, width 0.3s ease-out;
+  transition: font-size 0.3s, width 0.3s ease-out;
+}
+
+.close-style {
+  font-size: 1rem;
+  width: 20% !important;
+  background-color: gray;
+}
+
+.close-style:hover {
+  color: black;
+  background-color: #ffffff;
+}
+
+#container {
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}

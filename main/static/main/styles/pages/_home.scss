@@ -1,0 +1,152 @@
+.grid-container {
+  margin: 0.5em 0;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-template-areas: "posts sidebar";
+  grid-column-gap: 1em;
+}
+
+.sidebar {
+  @extend %div-canvas;
+  grid-area: sidebar;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+
+  height: 15em;
+  background-color: #ddfde1;
+}
+
+.all-posts {
+  grid-area: posts;
+
+  .adding-posts {
+    text-align: center;
+    button {
+      width: 50%;
+    }
+    form {
+      textarea {
+        @extend %div-canvas;
+        background-color: white;
+        width: 100%;
+        border: none;
+        resize: none;
+      }
+
+      input {
+        margin: 0;
+        border: none;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.post {
+  @extend %div-canvas;
+  .post-profile-pic {
+    display: inline-block;
+    height: 4rem;
+    width: 4rem;
+    overflow: hidden;
+    border-radius: 100%;
+    img {
+      width: 100%;
+    }
+  }
+
+  h4 {
+    display: inline;
+    margin-left: 0.5em;
+    font-size: 1.5rem;
+    color: $button-color-green;
+
+    span {
+      margin-left: 0.5em;
+      color: gray;
+      font-size: 0.7rem;
+    }
+  }
+
+  p {
+    margin: 0.5em 0;
+    line-height: 1.4em;
+  }
+
+  .post-comment {
+    @extend %div-canvas;
+    box-shadow: none;
+    background-color: white;
+    border-radius: 1em;
+    padding: 1em;
+    .comment-profile-pic {
+      @extend .post-profile-pic;
+      height: 3rem;
+      width: 3rem;
+    }
+    h5 {
+      font-size: 1.1rem;
+      color: #4fac5a;
+
+      span {
+        margin-left: 0.5em;
+        color: gray;
+        font-size: 0.7rem;
+      }
+    }
+    p {
+      font-size: 0.85rem;
+    }
+  }
+
+  .post-buttonsAndstatus {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .post-status {
+      h5 {
+        color: $button-color-green;
+        font-weight: 300;
+        font-size: 0.99rem;
+        span {
+          color: black;
+          font-weight: bold;
+          margin: 0 0.1em;
+        }
+      }
+    }
+
+    .post-comment-btns {
+      display: flex;
+      justify-content: space-between;
+      button {
+        font-size: 1rem;
+        margin: 0.5em;
+        color: rgb(77, 77, 77);
+        background-color: #d0ffd5;
+        box-shadow: none;
+        &:hover {
+          color: rgb(255, 255, 255);
+          background-color: #698f6d;
+        }
+      }
+      .liked {
+        background-color: #82e5f7;
+        &:hover {
+          background-color: #3a595f;
+        }
+      }
+    }
+  }
+}
+
+#head {
+  transition: transform 0.5s;
+  &:hover {
+    transform: scale(1.03);
+  }
+}

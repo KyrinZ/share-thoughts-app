@@ -1,0 +1,50 @@
+.container {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  .left-empty-block {
+    height: 100%;
+  }
+}
+
+.login-background {
+  @include background-img("../images/login-background.svg", #e1ffe5);
+}
+
+.form {
+  text-align: center;
+  width: 50%;
+  img {
+    width: 100%;
+    margin-left: -1.5em;
+  }
+  form {
+    @extend %div-canvas;
+    width: 100%;
+    color: $button-color-green;
+    transition: transform 2s ease-out;
+    .form-itm {
+      font-size: 0.8rem;
+      text-align: start;
+      margin-top: 0.5em;
+      input {
+        font-size: 0.98rem;
+        background: none;
+      }
+    }
+    a {
+      margin-top: 0.5em;
+      display: block;
+    }
+
+    &:hover {
+      transform: scale(1.03);
+    }
+  }
+}
+
+.errors {
+  color: red;
+  font-size: 0.7rem;
+}

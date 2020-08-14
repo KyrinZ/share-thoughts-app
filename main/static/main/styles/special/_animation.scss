@@ -1,0 +1,32 @@
+#Post-form {
+  overflow: hidden;
+  transform: scaleY(0);
+  transform-origin: top;
+  height: 0px;
+  transition: transform 0.3s, height 0.3s ease-out;
+}
+
+#Post {
+  transition: font-size 0.3s, width 0.3s ease-out;
+}
+
+.close-style {
+  font-size: 1rem;
+  width: 20% !important;
+  background-color: gray;
+  &:hover {
+    color: black;
+    background-color: #ffffff;
+  }
+}
+
+#profile-settings-form {
+  @extend #Post-form;
+}
+#password-form {
+  @extend #Post-form;
+}
+
+#container {
+  transition: all 0.5s ease;
+}

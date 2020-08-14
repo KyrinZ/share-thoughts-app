@@ -1,0 +1,10 @@
+.first-container {
+  @extend %div-canvas;
+  text-align: center;
+  margin-top: 3em;
+  background-color: #c9f8e8a8;
+  .second-container {
+    @extend %div-canvas;
+    line-height: 1.5rem;
+  }
+}

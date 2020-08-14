@@ -1,0 +1,81 @@
+.main {
+  text-align: center;
+  height: 100vh;
+  overflow: hidden;
+  .logo-landing {
+    margin-top: 4rem;
+    margin-left: -2rem;
+    animation: slide-top 2s both;
+    img {
+      width: 30%;
+    }
+  }
+
+  .description {
+    animation: slide-top 2s both;
+    animation-delay: 3s;
+    @extend %div-canvas;
+    box-shadow: none;
+    background-color: $background-div-red;
+    font-size: 0.85rem;
+    line-height: 1.1rem;
+    width: 30%;
+    margin: 1rem auto auto auto;
+  }
+  .buttons-landing {
+    margin: 6rem auto;
+    button {
+      font-size: 1rem;
+      padding: 1rem 6rem;
+      width: auto;
+    }
+  }
+
+  .footer-background {
+    position: fixed;
+    bottom: 0;
+    z-index: -1;
+    width: 100%;
+    box-shadow: $box-shadow;
+  }
+}
+
+#log-in {
+  border: 0.1rem solid $button-color-red;
+  background-color: white;
+  color: $button-color-red;
+  transition: transform ease 0.3s;
+  &:hover {
+    transform: scale(1.05);
+    background-color: #f8e5e5;
+  }
+}
+#register {
+  background-color: $button-color-red;
+  color: white;
+  transition: transform ease 0.3s;
+  &:hover {
+    transform: scale(1.05);
+    color: $button-color-red;
+    background-color: #ffebeb;
+  }
+}
+
+.background-color {
+  background-color: #fff5f5;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  z-index: -2;
+}
+
+@keyframes slide-top {
+  0% {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 100%;
+  }
+}

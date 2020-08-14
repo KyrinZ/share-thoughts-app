@@ -1,0 +1,51 @@
+{% extends 'login_register/layout.html' %}
+{% load static %}
+
+{% block title %}
+Register
+{% endblock title %}
+
+{% block body %}
+<div class="container register-background register-mb-bkg">
+    <div class="left-empty-block">
+        <!-- Empty Container -->
+    </div>
+    <div class="right-form-block">
+        <div class="form register-form">
+            <a href="{% url 'main:main' %}"><img src="{% static 'main/images/register-logo.svg' %}" alt="logo"></a>
+
+
+            <form class="register-form" action="{% url 'login_register:register' %}" method="post">
+                {% csrf_token %}
+
+                <h1>Register</h1>
+
+                <div class="form-itm">
+                    {{form.username.label}}
+                    {{form.username}}
+                </div>
+
+                <div class="form-itm">
+                    {{form.password.label}}
+                    {{form.password}}
+                </div>
+
+                <div class="form-itm">
+                    {{form.confirmation.label}}
+                    {{form.confirmation}}
+                </div>
+
+                {% if form.non_field_errors %}
+                <div class="errors">
+                    {{form.non_field_errors}}
+                </div>
+                {% endif %}
+                <button type="submit">Register</button>
+                <a href="{% url 'login_register:login' %}">Already have an account?</a>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock body %}

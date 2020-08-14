@@ -1,0 +1,28 @@
+.post {
+  .comment-profile-fit {
+    img {
+      width: 5%;
+    }
+    h5 {
+      display: inline;
+      margin-left: 0.5em;
+    }
+  }
+}
+
+.adding-comment {
+  text-align: center;
+  form {
+    textarea {
+      margin: 0.5em 0;
+      padding: 1em;
+      border-radius: 0.5em;
+      width: 100%;
+      border: none;
+      resize: none;
+    }
+    button {
+      width: 50%;
+    }
+  }
+}

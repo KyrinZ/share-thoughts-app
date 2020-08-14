@@ -1,0 +1,71 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}
+Post
+{% endblock title %}
+
+{% block body %}
+
+<div class="post">
+    <div class="post-profile-pic">
+        <img src="{{post.user.profile.profile_pic.url}}" alt="profile pic">
+    </div>
+    <h4>{% if post.user.profile.show_nickname %}
+        {{post.user.profile.nickname}}
+        {% else %}
+        {{post.user}}
+        {% endif %}<span>{{post.date_posted}}</span></h4>
+    <p>{{post.text_field}}</p>
+
+    <div class="post-buttonsAndstatus">
+        <div class="post-status">
+            <h5 id="post-{{post.id}}">likes: {{post.likeforpost_set.count}} comments: {{post.comment_set.count}}</h5>
+        </div>
+        <div class="post-comment-btns">
+            <button id="like-post">like</button>
+        </div>
+    </div>
+
+    {% for comment in comments %}
+    <div class="post-comment comment-profile-fit">
+        <div class="comment-profile-pic">
+            <img src="{{comment.user.profile.profile_pic.url}}" alt="profile pic">
+        </div>
+        <h5>{% if comment.user.profile.show_nickname %}
+            {{comment.user.profile.nickname}}
+            {% else %}
+            {{comment.user}}
+            {% endif %}<span>{{comment.date_commented}}</span></h5>
+        <p>{{comment.text_field}}</p>
+        <div class="post-buttonsAndstatus">
+            <div class="post-status">
+                <h5 id="comment-{{comment.id}}">likes: {{comment.likeforcomment_set.count}}</h5>
+            </div>
+            <div class="post-comment-btns">
+                <button class="like-comment" data-commentId="{{comment.id}}">like</button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+
+    <div class="adding-comment">
+        <form action="#" method="POST">
+            {{ comment_form.non_field_errors }}
+            {% csrf_token %}
+            {{comment_form.text_field}}
+            <button type="submit">Comment</button>
+        </form>
+    </div>
+</div>
+
+{% endblock body %}
+
+{% block script %}
+<script>
+    const postID = Number('{{ post.id }}')
+    const totalComments = Number('{{post.comment_set.count}}')
+</script>
+<script src="{% static 'main/js/post.js' %}"></script>
+{% endblock script %}

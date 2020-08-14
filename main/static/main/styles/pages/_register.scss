@@ -1,0 +1,27 @@
+.register-background {
+  @include background-img("../images/register-background.svg", #ffedd9);
+}
+
+.register-form {
+  form {
+    color: $button-color-red;
+    background-color: $background-div-red;
+    input {
+      border: 0.1em solid $button-color-red;
+    }
+
+    button {
+      background-color: $button-color-red;
+      &:hover {
+        color: $button-color-red;
+        background-color: #ffebeb;
+      }
+    }
+    a {
+      color: #c27a7a;
+      &:hover {
+        color: $button-color-red;
+      }
+    }
+  }
+}

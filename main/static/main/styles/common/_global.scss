@@ -1,0 +1,43 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.97rem;
+}
+
+a {
+  cursor: pointer;
+  color: #7abb84;
+  text-decoration: none;
+  transition: $transition-hover-anchor;
+  &:hover {
+    color: $button-color-green;
+  }
+}
+
+button {
+  @extend %form-inputs;
+  cursor: pointer;
+  color: white;
+  background-color: $button-color-green;
+  font-size: 1.3rem;
+  box-shadow: $box-shadow;
+  border: none;
+  transition: $transition-hover-buttons;
+  &:hover {
+    color: $button-color-green;
+    background-color: #d0ffd5;
+  }
+}
+input {
+  @extend %form-inputs;
+  border: 0.1em solid $button-color-green;
+}
+
+ul,
+ol {
+  list-style-type: none;
+}

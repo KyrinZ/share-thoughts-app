@@ -1,0 +1,23 @@
+{% extends 'profile_app/layout.html' %}
+{% load static %}
+
+{% block title %}
+Error
+{% endblock title %}
+
+{% block body %}
+{% if change_password_form.non_field_errors %}
+<div class="messages msg-red">
+  {{ change_password_form.non_field_errors }}
+</div>
+{% endif %}
+{% if profile_form.non_field_errors %}
+<div class="messages msg-red">
+  {{profile_form.non_field_errors}}
+</div>
+{% endif %}
+
+<div class="error-page">
+  <a href="{% url 'profile_app:profile'%}">Go back =></a>
+</div>
+{% endblock body %}

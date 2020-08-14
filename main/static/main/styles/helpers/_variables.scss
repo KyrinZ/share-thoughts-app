@@ -1,0 +1,39 @@
+$button-color-green: #26712f;
+$button-color-red: #b92626;
+
+$background-div-green: #c9f8cfd3;
+$background-div-red: #ffdfbae0;
+
+$transition-hover-buttons: color 0.5s, background-color 0.5s;
+$transition-hover-anchor: color 0.5s;
+
+$box-shadow: 0px 13px 22px rgba(0, 0, 0, 0.15);
+
+%form-inputs {
+  width: 100%;
+  padding: 0.5em 1em;
+  margin: 0.2em 0;
+  border-radius: 2em;
+}
+
+%div-canvas {
+  padding: 2em;
+  margin: 0.5em;
+  border-radius: 2em;
+  box-shadow: $box-shadow;
+  background-color: $background-div-green;
+}
+
+%extend-background {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+}
+
+%anchor-red {
+  color: #c27a7a;
+  &:hover {
+    color: $button-color-red;
+  }
+}

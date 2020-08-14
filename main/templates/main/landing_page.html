@@ -1,0 +1,51 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    Landing
+  </title>
+  <link rel="stylesheet" href="{% static 'main/styles/reset.css' %}">
+  <link rel="stylesheet" href="{% static 'main/styles/main.css' %}">
+</head>
+
+<body>
+  <div class="background-color"></div>
+  <div class="main">
+    <div class="logo-landing">
+      <img src="{% static 'main/images/register-logo.svg' %}" alt="logo">
+    </div>
+    <div class="description">
+      <p>Welcome to my dummy web application, where you can share your thoughts with others. Before you enter, please do
+        not give your personal information as this site is not secure.</p>
+    </div>
+
+
+    <div class="buttons-landing">
+      <button id="log-in">Log In</button>
+      <button id="register">Register</button>
+    </div>
+    <div class="footer-background">
+      <svg viewBox="0 0 1366 232" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="682.5" cy="166.5" rx="784.5" ry="166.5" fill="url(#paint0_linear)" />
+        <defs>
+          <linearGradient id="paint0_linear" x1="-102" y1="166.5" x2="898.283" y2="166.5"
+            gradientUnits="userSpaceOnUse">
+            <stop stop-color="#E92B2B" />
+            <stop offset="1" stop-color="#F7AB53" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <script src="{% static 'main/js/main.js' %}"></script>
+
+
+</body>
+
+</html>

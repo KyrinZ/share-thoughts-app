@@ -1,0 +1,103 @@
+{% extends 'profile_app/layout.html' %}
+{% load static %}
+
+{% block title %}
+Profile - {{user.get_username}}
+{% endblock title %}
+
+{% block body %}
+<div class="Profile">
+    <div class="profile-pic">
+        <img src="{{profile.profile_pic.url}}" alt="Profile Pic">
+    </div>
+    <h1>{{user.get_username}}</h1>
+    <h2>{{profile.nickname}}</h2>
+</div>
+
+{% if change_password_form.non_field_errors %}
+<div class="errors">
+    {{ change_password_form.non_field_errors }}
+</div>
+{% endif %}
+{% if profile_form.non_field_errors %}
+<div class="errors">
+    {{profile_form.non_field_errors}}
+</div>
+{% endif %}
+<div class="info">
+
+    <!-- Profile Form -->
+    <div class="profile-settings">
+        <a id="profile-settings">Profile Settings</a>
+
+        <form id="profile-settings-form" enctype="multipart/form-data" action="{% url 'profile_app:profile_settings' %}"
+            method="post">
+            {% csrf_token %}
+            <label for="profile_pic">Profile Picture</label>
+            {{ profile_form.profile_pic }}
+            <label for="nickname">Nickname</label>
+            {{ profile_form.nickname }}
+            <div class="bool">
+                <label for="show-name">Show nickname instead of username</label>
+                {{ profile_form.show_nickname }}
+            </div>
+
+            <button type="submit">Save</button>
+        </form>
+    </div>
+
+    <!-- Password Form -->
+    <div class="change-password">
+        <a id="password-button">Change Password</a>
+
+        <form id="password-form" action="{% url 'profile_app:change_password' %}" method="post">
+            {% csrf_token %}
+            <div class="form-item">
+                <label for="old-password"> Old Password</label>
+                {{ change_password_form.old_password }}
+            </div>
+            <div class="form-item">
+                <label for="new-password"> New Password</label>
+                {{ change_password_form.new_password }}
+            </div>
+            <div class="form-item">
+                <label for="confirmation"> Confirm Password</label>
+                {{ change_password_form.confirmation }}
+            </div>
+            <button type="submit">Save</button>
+        </form>
+    </div>
+
+</div>
+
+<!-- Current User Posts -->
+<div class="user-posts">
+    <div class="heading">
+        <h1>All Posts</h1>
+    </div>
+
+    {% for post in posts %}
+    <div class="post post-red">
+        <h4><span>{{post.date_posted}}</span></h4>
+
+        <a class="delete" href="{% url 'profile_app:delete_post' post.id %}">Delete Post</a>
+
+        <p>{{post.text_field}}</p>
+
+        <div class="post-buttonsAndstatus post-buttonsAndstatus-red">
+            <div class="post-status post-status-red">
+                <h5>likes:<span>{{post.likeforpost_set.count}}</span> comments:<span>{{post.comment_set.count}}</span>
+                </h5>
+            </div>
+            <a href="{% url 'main:post' post.id %}">view full</a>
+
+        </div>
+    </div>
+    {% empty %}
+    <div class="errors">
+        No Posts
+    </div>
+
+    {% endfor %}
+</div>
+{% endblock body %}

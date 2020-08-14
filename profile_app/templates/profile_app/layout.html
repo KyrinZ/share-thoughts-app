@@ -1,0 +1,49 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+
+        {% endblock title %}
+    </title>
+    <link rel="stylesheet" href="{% static 'main/styles/reset.css' %}">
+    <link rel="stylesheet" href="{% static 'main/styles/main.css' %}">
+</head>
+
+<body>
+    <div class="profile-bkg-img">
+    </div>
+    <div class="header header-red">
+        <a href="{% url 'main:home' %}"><img src="{% static 'main/images/register-logo.svg' %}" alt="logo"></a>
+
+        <div class="navbar navbar-red">
+            <a href="{% url 'main:home' %}">home</a>
+            <a href="{% url 'main:about' %}">about</a>
+            <a href="{% url 'profile_app:profile' %}">profile</a>
+            <a href="{% url 'login_register:logout' %}">logout</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        {% if messages %}
+        <ul class="messages msg-orange">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% block body %}
+        {% endblock body %}
+
+    </div>
+
+    <script src="{% static 'main/js/profile.js' %}"></script>
+</body>
+
+</html>

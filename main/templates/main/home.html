@@ -1,0 +1,44 @@
+{% extends 'main/layout.html' %}
+
+{% load static %}
+
+{% block title %}
+Home
+{% endblock title %}
+
+{% block body %}
+
+<div class="grid-container">
+    <div class="sidebar">
+
+
+        <a href="{% url 'main:filter' 'latest' %}">latest</a>
+        <a href="{% url 'main:filter' 'oldest' %}">oldest</a>
+        <a href="{% url 'main:filter' 'popularity' %}">popularity</a>
+    </div>
+    <div class="all-posts">
+        <!-- Post form -->
+        <div class="adding-posts">
+            {{ post_form.non_field_errors }}
+            <button id="Post">+ Share your thoughts +</button>
+            <form id="Post-form" class="close" action="{% url 'main:home' %}" method="POST">
+                {% csrf_token %}
+                {{ post_form.text_field }}
+                <button type="submit">Post</button>
+            </form>
+        </div>
+
+
+
+    </div>
+</div>
+{% endblock body %}
+
+
+{% block script %}
+<script>
+    const totalPaginatedPages = Number('{{total_paginated_pages}}');
+</script>
+<script src="{% static 'main/js/post_form.js' %}"></script>
+<script src="{% static 'main/js/fetch_data.js' %}"></script>
+{% endblock script %}

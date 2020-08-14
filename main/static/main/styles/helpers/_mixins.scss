@@ -1,0 +1,8 @@
+@mixin background-img($image, $color) {
+  background-image: url($image);
+  background-color: $color;
+  background-size: cover;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  z-index: -1;
+}
