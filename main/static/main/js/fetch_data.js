@@ -113,7 +113,7 @@ function add_post(data) {
   likeButton.onclick = () =>
     likingPost(likeButton, data.post_id, data.total_comments);
   commentButton.onclick = () =>
-    (location.href = window.location.origin + `post/${data.post_id}`);
+    (location.href = window.location.origin + `/post/${data.post_id}`);
   buttons.append(likeButton);
   buttons.append(commentButton);
   postButtons.append(buttons);
@@ -142,7 +142,6 @@ function likingPost(button, postID, totalComments) {
       return response.json();
     })
     .then((jsonData) => {
-      console.log(jsonData);
       if (jsonData.liked) {
         button.classList.add("liked");
       } else {
@@ -152,10 +151,4 @@ function likingPost(button, postID, totalComments) {
       const totalLike = jsonData.total_like_post;
       like.innerHTML = `likes: ${totalLike} comments: ${totalComments}`;
     });
-  // Second fetch is to get api info about 'like'
-  // the json looks like this:
-  // {
-  //   'total_like_post': some_value,
-  //   'liked'         : boolean_value
-  // }
 }

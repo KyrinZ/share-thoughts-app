@@ -52,12 +52,18 @@ class Comment(models.Model):
 
 
 class LikeForPost(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     liked = models.BooleanField(blank=True, default=True)
 
+    class Meta:
+        unique_together = ('user', 'post')
+
 
 class LikeForComment(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
     liked = models.BooleanField(blank=True, default=True)
+
+    class Meta:
+        unique_together = ('user', 'comment')
