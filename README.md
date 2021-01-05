@@ -1,5 +1,11 @@
 # Share Thoughts
 
+[View live site](https://share-thoughts-social-media.herokuapp.com)
+
+![screenshot1](./screenshots/screenshot2.png)
+![screenshot1](./screenshots/screenshot3.png)
+![screenshot1](./screenshots/screenshot1.png)
+
 I have created this simple web application with Django that shares people thoughts as
 post and other people can comment or like on this. Its similar to Facebook post
 system or twitter tweets but simpler version. I have used pure JavaScript to
