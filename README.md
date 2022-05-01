@@ -1,6 +1,5 @@
 # Share Thoughts
 
-[View live site](https://share-thoughts-social-media.herokuapp.com)
 
 ![screenshot1](./screenshots/screenshot2.png)
 ![screenshot1](./screenshots/screenshot3.png)
