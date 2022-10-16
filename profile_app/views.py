@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.forms import ValidationError
 
-from main.models import *
+from share_thoughts.models import *
 
 from .forms import *
 

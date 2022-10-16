@@ -10,7 +10,7 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.contrib import messages
 
 from .forms import *
-from main.models import *
+from share_thoughts.models import *
 
 
 # Regsiter view
