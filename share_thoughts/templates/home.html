@@ -1,0 +1,506 @@
+{% extends 'layouts/default.html' %}
+
+<!--  -->
+{% load static %}
+
+<!--  -->
+{% block meta %}
+<title>Share Thoughts</title>
+{% endblock meta %}
+
+<!--  -->
+{% block styles %}
+<style>
+  :root {
+    --header-transition: all 0.4s ease;
+  }
+  nav {
+    display: flex;
+    justify-content: space-between;
+    padding-inline: 2rem;
+    padding-top: 2rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    transition: var(--header-transition);
+  }
+  .logo-link {
+    transform: translateY(-0.8125rem);
+  }
+
+  .logo-link img {
+    width: 12.1875rem;
+    transition: var(--header-transition);
+  }
+
+  ul a {
+    text-decoration: none;
+    color: var(--primary-color);
+    position: relative;
+    padding-bottom: 0.5rem;
+    transition: var(--header-transition);
+  }
+  ul a::after {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    height: 1px;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  }
+
+  ul a:hover {
+    color: #bfff0a;
+  }
+  ul a:hover::after {
+    background-color: #bfff0a;
+    width: 100%;
+  }
+
+  nav[data-on-top="false"] {
+    padding-top: 1.5rem;
+    padding-bottom: 0.5rem;
+    background-color: #191a19;
+  }
+
+  nav[data-on-top="false"] li {
+    transform: translateY(-0.375rem);
+  }
+
+  ul {
+    display: flex;
+    list-style: none;
+    align-items: center;
+    transition: transform 0.4s ease;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #191a19;
+    flex-direction: column;
+    gap: 3rem;
+    z-index: 2;
+    transform: translateX(100%);
+  }
+  ul li {
+    padding-inline: 6rem;
+  }
+  .backdrop {
+    position: fixed;
+    background-color: #00000082;
+    inset: 0;
+    z-index: 1;
+    display: none;
+  }
+
+  .hamburger,
+  .close {
+    width: fit-content;
+    height: fit-content;
+    font-size: 27px;
+    background-color: transparent;
+    color: var(--primary-color);
+    padding: 0.5rem;
+    border: none;
+    cursor: pointer;
+  }
+
+  .close {
+    align-self: flex-end;
+    margin-right: 1rem;
+    margin-top: 1rem;
+  }
+
+  ul[data-is-open="true"] {
+    transform: translateX(0);
+  }
+  ul[data-is-open="true"] ~ .backdrop {
+    display: block;
+  }
+
+  @media (min-width: 600px) {
+    nav[data-on-top="false"] .logo-link img {
+      width: 7rem;
+    }
+    ul {
+      position: static;
+      flex-direction: row;
+
+      background-color: transparent;
+      transform: translateX(0);
+    }
+    ul li {
+      padding-inline: 0;
+    }
+    .hamburger,
+    .close,
+    .backdrop {
+      display: none !important;
+    }
+  }
+
+  .bg-wrapper {
+    background-color: #191a19;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  main {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 600px;
+    padding-block: 4rem;
+    padding-inline: 1rem;
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+  }
+
+  .postCard {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+  }
+  .postCard__header {
+    display: flex;
+    column-gap: 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+  .postCard__avatar {
+    width: 3rem;
+    border-radius: 100%;
+  }
+  .postCard__username {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #464646;
+  }
+  .postCard__time {
+    font-size: 0.75rem;
+    color: rgb(79, 79, 79);
+  }
+
+  .postCard .fa-ellipsis-vertical {
+    margin-left: auto;
+    font-size: 1rem;
+    color: #464646;
+    cursor: pointer;
+  }
+
+  .postCard__post {
+    font-size: 0.875rem;
+    line-height: 1.4em;
+    margin-bottom: 0.5rem;
+  }
+
+  .commentInput {
+    display: flex;
+    align-items: center;
+    border: 1px solid rgb(92, 92, 92);
+    border-radius: 0.2rem;
+    margin-bottom: 1rem;
+  }
+  .commentInput input {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: inherit;
+    border: none;
+    font-size: 0.9375rem;
+  }
+  .commentInput input::placeholder {
+    color: rgb(201, 201, 201);
+  }
+  .commentInput input:focus {
+    outline: none;
+    border: none;
+  }
+  .commentInput .fa-paper-plane {
+    color: rgb(92, 92, 92);
+  }
+
+  .commentCard {
+  }
+  .commentCard__header {
+    display: flex;
+    align-items: center;
+  }
+
+  .commentCard__avatar {
+    width: 2rem;
+    border-radius: 100%;
+    margin-right: 0.6rem;
+  }
+
+  .commentCard__username {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: #464646;
+    margin-right: 0.3rem;
+  }
+  .commentCard__time {
+    font-size: 0.75rem;
+    color: rgb(79, 79, 79);
+  }
+
+  .commentCard__post {
+    font-size: 0.8125rem;
+    line-height: 1.4em;
+    margin-bottom: 0.5rem;
+  }
+  .postForm {
+  }
+  .postForm textarea {
+    display: block;
+    width: 100%;
+    padding: 0.9rem;
+    border-top-left-radius: 0.3rem;
+    border-top-right-radius: 0.3rem;
+    resize: none;
+    transition: all 0.3s ease-in-out;
+    height: 3rem;
+    font-size: 12px;
+    border: none;
+    background-color: #ffffff;
+    color: black;
+  }
+  .postForm__buttonWrapper {
+    width: 100%;
+    background-color: #ffffff;
+    padding: 1rem;
+    border-bottom-left-radius: 0.3rem;
+    border-bottom-right-radius: 0.3rem;
+  }
+
+  .postForm textarea:focus,
+  .postForm textarea[data-has-value="true"] {
+    outline: none;
+    border: none;
+    height: 3rem;
+    height: 6rem;
+    font-size: 18px;
+  }
+
+  .postForm__submit {
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    column-gap: 0.3rem;
+  }
+
+  .postForm__submit span {
+    font-size: inherit;
+    line-height: 0.8em;
+    transition: font-size 0.3s ease-in-out;
+  }
+
+  .postForm__submit i {
+    transition: font-size 0.3s ease-in-out;
+    margin-top: -0.15em;
+  }
+  .postForm__submit:hover {
+    color: #9bae66;
+  }
+</style>
+{% endblock styles %}
+
+<!--  -->
+{% block body %}
+
+<div class="bg-wrapper">
+  <div style="height: 5.125rem"></div>
+  <nav class="container">
+    <a href="{% url 'home' %}" class="logo-link">
+      <img src="{% static 'assets/logo-green.svg' %}" alt="logo" />
+    </a>
+
+    <ul class="menu" data-is-open="false">
+      <button class="close"><i class="fa-solid fa-xmark"></i></button>
+      <li><a href="{% url 'about' %}">About</a></li>
+      <li><a href="{% url 'profile' %}">Profile</a></li>
+      <li><a href="{% url 'login' %}">Login</a></li>
+    </ul>
+    <div class="backdrop"></div>
+    <button class="hamburger"><i class="fa-solid fa-bars"></i></button>
+  </nav>
+
+  <main>
+    <form class="postForm">
+      <textarea
+        class="no-scroll-bar"
+        placeholder="Share your thougts here..."
+        id="post_input"
+        data-has-value="false"
+      ></textarea>
+
+      <div class="postForm__buttonWrapper">
+        <button type="button" class="postForm__submit">
+          <i class="fa-regular fa-square-plus"></i>
+          <span>Share</span>
+        </button>
+      </div>
+    </form>
+
+    <div class="postCard">
+      <div class="postCard__header">
+        <img
+          class="postCard__avatar"
+          src="{% static 'assets/default_profile_pic.jpg' %}"
+        />
+
+        <div>
+          <p class="postCard__username">Username</p>
+          <p class="postCard__time">2 min ago</p>
+        </div>
+
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+      </div>
+
+      <p class="postCard__post">
+        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vitae
+        consequatur quam commodi esse, dolorum deleniti voluptates in explicabo
+        ullam cum! Itaque, ratione beatae quaerat numquam ab nobis dolores
+        expedita atque.
+      </p>
+
+      <i class="fa-regular fa-heart" style="margin-bottom: 1rem"></i
+      >&nbsp;&nbsp;3
+
+      <div class="commentInput">
+        <input type="text" placeholder="Add your comment" />
+        <span style="padding-inline: 0.5rem">
+          <i class="fa-regular fa-paper-plane"></i>
+        </span>
+      </div>
+
+      <div class="commentCard">
+        <div class="commentCard__header">
+          <img
+            class="commentCard__avatar"
+            src="{% static 'assets/default_profile_pic.jpg' %}"
+          />
+          <p class="commentCard__username">Username</p>
+          <p class="commentCard__time">2 min ago</p>
+        </div>
+        <div style="margin-left: 2.6rem">
+          <p class="commentCard__post">
+            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vitae
+            consequatur quam commodi esse, dolorum deleniti voluptates in
+            explicabo ullam cum! Itaque, ratione beatae quaerat numquam ab nobis
+            dolores expedita atque.
+          </p>
+
+          <i class="fa-regular fa-heart" style="margin-bottom: 1rem"></i
+          >&nbsp;&nbsp;2
+        </div>
+      </div>
+
+      <a href="#" style="color: rgb(74, 74, 74); text-decoration: none"
+        >View more comments (21)</a
+      >
+    </div>
+
+    <div class="postCard">
+      <div class="postCard__header">
+        <img
+          class="postCard__avatar"
+          src="{% static 'assets/default_profile_pic.jpg' %}"
+        />
+
+        <div>
+          <p class="postCard__username">Username</p>
+          <p class="postCard__time">2 min ago</p>
+        </div>
+
+        <i class="fa-solid fa-ellipsis-vertical"></i>
+      </div>
+
+      <p class="postCard__post">
+        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vitae
+        consequatur quam commodi esse, dolorum deleniti voluptates in explicabo
+        ullam cum! Itaque, ratione beatae quaerat numquam ab nobis dolores
+        expedita atque.
+      </p>
+
+      <i class="fa-regular fa-heart" style="margin-bottom: 1rem"></i
+      >&nbsp;&nbsp;3
+
+      <div class="commentInput">
+        <input type="text" placeholder="Add your comment" />
+        <span style="padding-inline: 0.5rem">
+          <i class="fa-regular fa-paper-plane"></i>
+        </span>
+      </div>
+
+      <div class="commentCard">
+        <div class="commentCard__header">
+          <img
+            class="commentCard__avatar"
+            src="{% static 'assets/default_profile_pic.jpg' %}"
+          />
+          <p class="commentCard__username">Username</p>
+          <p class="commentCard__time">2 min ago</p>
+        </div>
+        <div style="margin-left: 2.6rem">
+          <p class="commentCard__post">
+            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vitae
+            consequatur quam commodi esse, dolorum deleniti voluptates in
+            explicabo ullam cum! Itaque, ratione beatae quaerat numquam ab nobis
+            dolores expedita atque.
+          </p>
+
+          <i class="fa-regular fa-heart" style="margin-bottom: 1rem"></i
+          >&nbsp;&nbsp;2
+        </div>
+      </div>
+
+      <a href="#" style="color: rgb(74, 74, 74); text-decoration: none"
+        >View more comments (21)</a
+      >
+    </div>
+  </main>
+</div>
+
+{% endblock body %}
+
+<!--  -->
+{% block script %}
+
+<script>
+  const nav = document.querySelector("nav");
+  window.onscroll = () => {
+    if (document.documentElement.scrollTop < 20) {
+      nav.dataset.onTop = true;
+    } else {
+      nav.dataset.onTop = false;
+    }
+  };
+
+  const postInput = document.querySelector("#post_input");
+  postInput.oninput = (ev) => {
+    if (postInput.value !== "") {
+      postInput.dataset.hasValue = true;
+    } else {
+      postInput.dataset.hasValue = false;
+    }
+  };
+
+  const hamburger = document.querySelector(".hamburger");
+  const close = document.querySelector(".close");
+  const menu = document.querySelector(".menu");
+  hamburger.onclick = () => {
+    menu.dataset.isOpen = true;
+  };
+  close.onclick = () => {
+    menu.dataset.isOpen = false;
+  };
+</script>
+{% endblock script %}

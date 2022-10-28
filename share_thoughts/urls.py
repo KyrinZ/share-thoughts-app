@@ -1,13 +1,17 @@
 from django.urls import path
 from . import views
 
-app_name = 'main'
 urlpatterns = [
     # Page Url
-    path('', views.landing_page, name='main'),
-    path('home/', views.home, name='home'),
-    path('post/<int:post_id>/', views.post, name='post'),
+    path('', views.home, name='home'),
+    path('profile/', views.profile, name='profile'),
+    path('login/', views.login, name='login'),
+    path('registration/', views.registration, name='registration'),
     path('about/', views.about, name='about'),
+    path('s/', views.landing_page, name='landing_page'),
+    path('home2/', views.home2, name='home2'),
+    path('post/<int:post_id>/', views.post, name='post'),
+    path('abou2t/', views.about2, name='about2'),
 
     # Function Url(filter, liking post, liking comment)
     path('like-post/<int:post_id>/',

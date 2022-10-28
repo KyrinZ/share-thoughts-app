@@ -1,3 +1,4 @@
+from multiprocessing import context
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -13,17 +14,33 @@ from .myfunctions import post_jsonify
 # Number of post for pagination
 NUMBER_OF_POSTS = 10
 
-
 # Landing page view
 def landing_page(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse('main:home'))
     return render(request, 'main/landing_page.html')
 
-
-# Home View
-@login_required(login_url='login_register:login')
 def home(request):
+    context = {}
+    return render(request, 'home.html', context)
+    
+def profile(request):
+    context = {}
+    return render(request, 'profile.html', context)
+
+def login(request):
+    context = {}
+    return render(request, 'login.html', context)
+
+def registration(request):
+    context = {}
+    return render(request, 'registration.html', context)
+
+def about(request):
+    context = {}
+    return render(request, 'about.html', context)
+
+def home2(request):
     post_form = PostForm()
 
     if request.method == 'POST':
@@ -75,7 +92,7 @@ def post(request, post_id):
 
 # About View
 @login_required(login_url='login_register:login')
-def about(request):
+def about2(request):
     return render(request, 'main/about.html', {
         'background': 'about-bkg-img'
     })

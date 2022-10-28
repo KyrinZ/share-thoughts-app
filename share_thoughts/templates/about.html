@@ -1,0 +1,82 @@
+{% extends 'layouts/default.html' %}
+
+<!--  -->
+{% load static %}
+
+<!--  -->
+{% block meta %}
+<title>Share Thoughts - About</title>
+{% endblock meta %}
+
+<!--  -->
+{% block styles %}
+<style>
+  .bg-wrapper {
+    background-color: #191a19;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  nav {
+    padding-inline: 1rem;
+    padding-top: 2rem;
+  }
+  .back-link {
+    color: white;
+    font-size: 2rem;
+  }
+
+  main {
+    width: min(600px, 100%);
+    margin-inline: auto;
+    margin-top: 4rem;
+    color: white;
+  }
+
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 0.7rem;
+    font-weight: 900;
+  }
+  p {
+    margin-bottom: 1rem;
+    line-height: 1.7em;
+  }
+</style>
+{% endblock styles %}
+
+<!--  -->
+{% block body %}
+
+<div class="bg-wrapper">
+  <nav class="container">
+    <a href="{% url 'home' %}" class="back-link">
+      <i class="fa-solid fa-angle-left"></i>
+    </a>
+  </nav>
+
+  <main>
+    <h1>Lorem ipsum dolor sit amet.</h1>
+    <p>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus nulla
+      eos distinctio sequi eligendi! Alias dolor consequuntur minus labore
+      voluptas. Porro eius sint reiciendis nam provident non consequatur
+      quisquam repudiandae accusantium, earum esse architecto sequi eligendi
+      veritatis enim adipisci dolorum iste assumenda, distinctio cumque vero
+      impedit autem nemo. Dolore, beatae?
+    </p>
+    <p>
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga ab, itaque
+      delectus voluptatibus nam aperiam vero a eveniet architecto porro vitae
+      dolorem perferendis molestias iste culpa veritatis at numquam. Corrupti!
+    </p>
+  </main>
+</div>
+
+{% endblock body %}
+
+<!--  -->
+{% block script %}
+
+<script></script>
+{% endblock script %}

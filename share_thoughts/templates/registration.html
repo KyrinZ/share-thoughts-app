@@ -1,0 +1,168 @@
+{% extends 'layouts/default.html' %}
+
+<!--  -->
+{% load static %}
+
+<!--  -->
+{% block meta %}
+<title>Share Thoughts - Sign up</title>
+{% endblock meta %}
+
+<!--  -->
+{% block styles %}
+<style>
+  .bg-wrapper {
+    background-color: #191a19;
+    height: 100vh;
+    position: relative;
+  }
+  /* Photo by Andrea Piacquadio: https://www.pexels.com/photo/group-of-people-standing-beside-body-of-water-2672979/ */
+  .mainWrapper {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+  }
+
+  .mainWrapper > *:nth-child(1) {
+    position: relative;
+    flex: 1;
+    height: 200px;
+  }
+  .mainWrapper > *:nth-child(1)::after {
+    content: "";
+    display: block;
+    background-image: linear-gradient(
+      to top,
+      #191a19 6%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    position: absolute;
+    inset: 0;
+  }
+  .mainWrapper > *:nth-child(1) img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    vertical-align: middle;
+  }
+  .mainWrapper > *:nth-child(2) {
+    flex: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding-inline: 1rem;
+  }
+
+  form {
+    width: min(350px, 100%);
+    margin-inline: auto;
+  }
+
+  h1 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 3rem;
+  }
+  input {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #929191;
+    background-color: transparent;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: outline 0.3s ease;
+  }
+  input:focus {
+    outline: 1px solid var(--primary-color);
+  }
+
+  button[type="submit"] {
+    display: block;
+    width: min(10rem, 100%);
+    margin-inline: auto;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button[type="submit"]:hover {
+    background-color: var(--primary-color);
+  }
+  .s {
+    font-size: 12px;
+    color: #929191;
+    margin-top: 3rem;
+    text-align: center;
+  }
+  .s a {
+    font-size: 14px;
+    color: white;
+    font-weight: 700;
+  }
+  .s a:hover {
+    color: var(--primary-color);
+  }
+
+  @media (min-width: 500px) {
+    .mainWrapper {
+      flex-direction: row;
+    }
+
+    .mainWrapper > *:nth-child(1) {
+      position: relative;
+      flex: 1;
+      height: auto;
+    }
+    .mainWrapper > *:nth-child(1)::after {
+      background-image: linear-gradient(
+        to left,
+        #191a19 6%,
+        rgba(0, 0, 0, 0) 100%
+      );
+    }
+
+    .mainWrapper > *:nth-child(2) {
+      flex: 1;
+    }
+  }
+</style>
+{% endblock styles %}
+
+<!--  -->
+{% block body %}
+
+<div class="bg-wrapper">
+  <div class="mainWrapper">
+    <div>
+      <img src="{% static 'assets/kv2.jpg' %}" alt="kv" />
+    </div>
+    <div>
+      <form>
+        <h1>Sign up</h1>
+        <input type="text" placeholder="Username" />
+
+        <input type="password" placeholder="Password" />
+        <input type="password" placeholder="Confirm password" />
+        <button type="submit">Register</button>
+
+        <p class="s">
+          Already have an account? <a href="{% url 'login' %}">Sign in</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock body %}
+
+<!--  -->
+{% block script %}
+
+<script></script>
+{% endblock script %}

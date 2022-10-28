@@ -1,0 +1,163 @@
+{% extends 'layouts/default.html' %}
+
+<!--  -->
+{% load static %}
+
+<!--  -->
+{% block meta %}
+<title>Share Thoughts - Profile</title>
+{% endblock meta %} {% block styles %}
+<style>
+  .bg-wrapper {
+    background-color: #191a19;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  nav {
+    padding-inline: 1rem;
+    padding-top: 2rem;
+  }
+  .back-link {
+    color: white;
+    font-size: 2rem;
+  }
+
+  form {
+    width: min(100%, 440px);
+    margin-inline: auto;
+    margin-top: 3rem;
+    padding-inline: 1rem;
+  }
+
+  .profileAvatar {
+    width: fit-content;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .profileAvatar input[type="file"] {
+    appearance: none;
+    display: none;
+  }
+  .profileAvatar label {
+    position: relative;
+    border-radius: 100%;
+    overflow: hidden;
+    display: inline-block;
+    cursor: pointer;
+    margin-inline: auto;
+  }
+  .profileAvatar img {
+    width: 6rem;
+    border-radius: inherit;
+    vertical-align: middle;
+  }
+
+  .profileAvatar label::after {
+    content: "Edit";
+    display: inline-block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding-top: 0.2rem;
+    padding-bottom: 0.3rem;
+    background-color: #32323295;
+    color: white;
+    font-size: 0.875rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .profileAvatar label:hover::after {
+    opacity: 1;
+  }
+
+  .profileAvatar__nickname {
+    color: var(--primary-color);
+    font-size: 2rem;
+    padding-top: 1rem;
+  }
+  .profileAvatar__username {
+    color: #929191;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #929191;
+    background-color: transparent;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: outline 0.3s ease;
+  }
+  input:focus {
+    outline: 1px solid var(--primary-color);
+  }
+  input:last-child {
+    margin-bottom: 0;
+  }
+
+  button[type="submit"] {
+    display: block;
+    width: min(10rem, 100%);
+    margin-inline: auto;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button[type="submit"]:hover {
+    background-color: var(--primary-color);
+  }
+
+  .changePwdTxt {
+    font-size: 0.75rem;
+    color: #929191;
+    margin-top: 0.9rem;
+    margin-bottom: 0.6rem;
+  }
+</style>
+{% endblock styles %}
+
+<!--  -->
+
+{% block body %}
+
+<div class="bg-wrapper">
+  <nav class="container">
+    <a href="{% url 'home' %}" class="back-link">
+      <i class="fa-solid fa-angle-left"></i>
+    </a>
+  </nav>
+
+  <form enctype="multipart/form-data">
+    <div class="profileAvatar">
+      <input type="file" name="profile_pic" id="profile_pic" />
+      <label for="profile_pic">
+        <img
+          class="avatar"
+          src="{% static 'assets/default_profile_pic.jpg' %}"
+        />
+      </label>
+      <p class="profileAvatar__nickname">Nickname</p>
+      <p class="profileAvatar__username">@Username</p>
+    </div>
+    <div style="height: 3rem"></div>
+    <input type="text" placeholder="Nickname" name="nickname" />
+
+    <p class="changePwdTxt">Change Password</p>
+    <input type="password" placeholder="Password" name="password" />
+    <input type="password" placeholder="Confirm Password" name="confirmation" />
+
+    <button type="submit">Save</button>
+  </form>
+</div>
+
+{% endblock body %}
