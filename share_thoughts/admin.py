@@ -1,23 +1,23 @@
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .models import *
+from .models import Profile, Post, Comment, LikePost, LikeComment
 
 
-class ProfileAdminInline(admin.TabularInline):
+class ProfileAdminInline(admin.StackedInline):
     model = Profile
 
 
 class UserAdmin(BaseUserAdmin):
     fieldsets = [
-        ('User Info',               {'fields': ['username', 'password']}),
-        ('Important dates', {'fields': ('last_login', 'date_joined')})
+        (None, {"fields": ["username"]}),
     ]
+
     inlines = [ProfileAdminInline]
 
 
-class LikeForPostAdminInline(admin.TabularInline):
-    model = LikeForPost
+class LikePostAdminInline(admin.TabularInline):
+    model = LikePost
     extra = 0
 
 
@@ -28,29 +28,32 @@ class CommentAdminInline(admin.TabularInline):
 
 class PostAdmin(admin.ModelAdmin):
     fieldsets = [
-        ('User',               {'fields': ['user']}),
-        ('Post Area', {'fields': [
-            'text_field']}),
-        ('Date Posted', {'fields': ['date_posted']})
+        (
+            None,
+            {"fields": ["user", "content", "created_at", "updated_at"]},
+        ),
     ]
-    inlines = [CommentAdminInline, LikeForPostAdminInline]
-    list_display = ('user', 'date_posted')
+    readonly_fields = ("created_at", "updated_at")
+    inlines = [CommentAdminInline, LikePostAdminInline]
+    list_display = ("user", "created_at")
 
 
-class LikeForCommentAdminInline(admin.TabularInline):
-    model = LikeForComment
+class LikeCommentAdminInline(admin.TabularInline):
+    model = LikeComment
     extra = 0
+    fk_name = "comment"
 
 
 class CommentAdmin(admin.ModelAdmin):
     fieldsets = [
-        ('User',               {'fields': ['user', 'post']}),
-        ('Post Area', {'fields': [
-            'text_field']}),
-        ('Date commented', {'fields': ['date_commented']})
+        (
+            None,
+            {"fields": ["user", "post", "content", "created_at", "updated_at"]},
+        ),
     ]
-    inlines = [LikeForCommentAdminInline]
-    list_display = ('user', 'post', 'date_commented')
+    readonly_fields = ("created_at", "updated_at")
+    inlines = [LikeCommentAdminInline]
+    list_display = ("user", "post", "created_at")
 
 
 admin.site.unregister(User)
