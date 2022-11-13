@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 class Profile(models.Model):
     id = models.AutoField(primary_key=True)
-    user_id = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     nickname = models.CharField(default="Nickname", max_length=100)
     show_nickname = models.BooleanField(default=False, blank=True)
     image = models.ImageField(default="default.jpg")

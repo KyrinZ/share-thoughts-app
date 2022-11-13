@@ -69,6 +69,7 @@
     width: 100%;
     padding: 0.7rem;
     border: 1px solid #929191;
+    color: white;
     background-color: transparent;
     border-radius: 0.5rem;
     margin-bottom: 0.5rem;
@@ -94,18 +95,18 @@
   button[type="submit"]:hover {
     background-color: var(--primary-color);
   }
-  .s {
+  .goto-link {
     font-size: 12px;
     color: #929191;
     margin-top: 3rem;
     text-align: center;
   }
-  .s a {
+  .goto-link a {
     font-size: 14px;
     color: white;
     font-weight: 700;
   }
-  .s a:hover {
+  .goto-link a:hover {
     color: var(--primary-color);
   }
 
@@ -143,14 +144,27 @@
       <img src="{% static 'assets/kv.jpg' %}" alt="kv" />
     </div>
     <div>
-      <form>
+      <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
         <h1>Sign in</h1>
-        <input type="text" placeholder="Username" />
+        <input
+          type="text"
+          name="username"
+          autocomplete="username"
+          placeholder="Username"
+          required
+        />
 
-        <input type="password" placeholder="Password" />
+        <input
+          type="password"
+          name="password"
+          autocomplete="current-password"
+          placeholder="Password"
+          required
+        />
         <button type="submit">Login</button>
 
-        <p class="s">
+        <p class="goto-link">
           Don't have an account? <a href="{% url 'registration' %}">Sign up</a>
         </p>
       </form>

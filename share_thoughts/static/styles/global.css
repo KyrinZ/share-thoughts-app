@@ -31,3 +31,43 @@ body {
     max-width: 768px;
   }
 }
+
+.messages {
+  position: fixed;
+  bottom: 0;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  list-style: none;
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 0.5rem;
+  row-gap: 1rem;
+  pointer-events: none;
+}
+
+.messages li {
+  padding: 1rem;
+  background-color: var(--primary-color);
+  color: var(--primary-color-dark);
+  border-radius: 0.3rem;
+  transform: translateY(20px);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  animation: fadein 1s ease forwards alternate;
+}
+
+.messages li.error {
+  background-color: #ffc7c7;
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

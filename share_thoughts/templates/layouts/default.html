@@ -11,14 +11,25 @@
       src="https://kit.fontawesome.com/a6169de16b.js"
       crossorigin="anonymous"
     ></script>
-    <link rel="stylesheet" href="{% static 'styles/global.css' %}" />
+    <link rel="stylesheet" href="{% static 'styles/global.css' %}?t={% now "jmYHisu" %}" />
     {% block styles %} {% endblock styles %}
   </head>
 
-  <body>
+  <body class="no-scroll-bar">
     {% block body %} {% endblock body %}
+
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 
     <!--  -->
     {% block script %} {% endblock script %}
+
+    
   </body>
 </html>
