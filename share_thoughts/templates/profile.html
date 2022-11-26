@@ -50,6 +50,8 @@
   }
   .profileAvatar img {
     width: 6rem;
+    aspect-ratio: 1/1;
+    background-color: gainsboro;
     border-radius: inherit;
     vertical-align: middle;
   }
@@ -92,6 +94,7 @@
     border-radius: 0.5rem;
     margin-bottom: 0.5rem;
     transition: outline 0.3s ease;
+    color: white;
   }
   input:focus {
     outline: 1px solid var(--primary-color);
@@ -136,25 +139,46 @@
       <i class="fa-solid fa-angle-left"></i>
     </a>
   </nav>
+  <form
+    enctype="multipart/form-data"
+    action="{% url 'profile' %}"
+    method="post"
+  >
+    {% csrf_token %}
 
-  <form enctype="multipart/form-data">
     <div class="profileAvatar">
-      <input type="file" name="profile_pic" id="profile_pic" />
-      <label for="profile_pic">
+      <input type="file" name="image" id="image" />
+      <label for="image">
         <img
           class="avatar"
-          src="{% static 'assets/default_profile_pic.jpg' %}"
+          src="{{ user.profile.image.url }}?t={% now 'jmYHisu' %}"
         />
       </label>
-      <p class="profileAvatar__nickname">Nickname</p>
-      <p class="profileAvatar__username">@Username</p>
+      <p class="profileAvatar__nickname">{{ user.profile.nickname }}</p>
+      <p class="profileAvatar__username">@{{ user.username }}</p>
     </div>
     <div style="height: 3rem"></div>
-    <input type="text" placeholder="Nickname" name="nickname" />
+    <input
+      type="text"
+      placeholder="Nickname"
+      name="nickname"
+      value="{{ user.profile.nickname }}"
+      autocomplete="username"
+    />
 
     <p class="changePwdTxt">Change Password</p>
-    <input type="password" placeholder="Password" name="password" />
-    <input type="password" placeholder="Confirm Password" name="confirmation" />
+    <input
+      type="password"
+      placeholder="New Password"
+      name="password"
+      autocomplete="new-password"
+    />
+    <input
+      type="password"
+      placeholder="Confirm Password"
+      name="confirmation"
+      autocomplete="new-password"
+    />
 
     <button type="submit">Save</button>
   </form>

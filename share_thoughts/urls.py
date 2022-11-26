@@ -9,4 +9,10 @@ urlpatterns = [
     path("logout/", views.logout_view, name="logout"),
     path("registration/", views.registration_view, name="registration"),
     path("about/", views.about_view, name="about"),
+    path("create-post/", views.create_post_view, name="create_post"),
+    path(
+        "create-comment/<int:post_id>/",
+        views.create_comment_view,
+        name="create_comment",
+    ),
 ]

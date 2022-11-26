@@ -219,6 +219,13 @@
     outline: none;
     border: none;
   }
+
+  .commentInput__button {
+    height: 2.125rem;
+    background-color: transparent;
+    cursor: pointer;
+    border: 0;
+  }
   .commentInput .fa-paper-plane {
     color: rgb(92, 92, 92);
   }
@@ -322,8 +329,8 @@
     <ul class="menu" data-is-open="false">
       <button class="close"><i class="fa-solid fa-xmark"></i></button>
       <li><a href="{% url 'about' %}">About</a></li>
-      <li><a href="{% url 'profile' %}">Profile</a></li>
       {% if user.is_authenticated %}
+      <li><a href="{% url 'profile' %}">Profile</a></li>
       <li><a href="{% url 'logout' %}">Logout</a></li>
       {% else %}
       <li><a href="{% url 'login' %}">Login</a></li>
@@ -334,139 +341,115 @@
   </nav>
 
   <main>
-    <form class="postForm">
+    {% if user.is_authenticated %}
+    <form class="postForm" action="{% url 'create_post' %}" method="post">
+      {% csrf_token %}
       <textarea
         class="no-scroll-bar"
         placeholder="Share your thougts here..."
         id="post_input"
+        name="post"
         data-has-value="false"
       ></textarea>
 
       <div class="postForm__buttonWrapper">
-        <button type="button" class="postForm__submit">
+        <button type="submit" class="postForm__submit">
           <i class="fa-regular fa-square-plus"></i>
           <span>Share</span>
         </button>
       </div>
     </form>
+    {% endif %}
+    <!--  -->
+
+    {% for post in posts %}
 
     <div class="postCard">
       <div class="postCard__header">
         <img
           class="postCard__avatar"
-          src="{% static 'assets/default_profile_pic.jpg' %}"
+          src="{{ post.user.profile.image.url }}?t={{ post.user.profile.created_at | date:'jmYHisu' }}"
         />
 
         <div>
-          <p class="postCard__username">Username</p>
-          <p class="postCard__time">2 min ago</p>
+          <p class="postCard__username">{{ post.user.username }}</p>
+          <p class="postCard__time">{{ post.created_at|timesince }}</p>
         </div>
 
+        {% if user == post.user %}
         <i class="fa-solid fa-ellipsis-vertical"></i>
+        {% endif %}
       </div>
 
-      <p class="postCard__post">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vitae
-        consequatur quam commodi esse, dolorum deleniti voluptates in explicabo
-        ullam cum! Itaque, ratione beatae quaerat numquam ab nobis dolores
-        expedita atque.
-      </p>
+      <p class="postCard__post">{{ post.content }}</p>
 
       <i class="fa-regular fa-heart" style="margin-bottom: 1rem"></i
-      >&nbsp;&nbsp;3
+      >&nbsp;&nbsp;{{ post.like_post_set.all.count }}
 
-      <div class="commentInput">
-        <input type="text" placeholder="Add your comment" />
-        <span style="padding-inline: 0.5rem">
-          <i class="fa-regular fa-paper-plane"></i>
-        </span>
-      </div>
+      <!--  -->
+      {% if user.is_authenticated %}
+      <form
+        class="commentInput"
+        action="{% url 'create_comment' post.id %}"
+        method="post"
+      >
+        {% csrf_token %}
+
+        <input type="text" placeholder="Add your comment" name="comment" />
+        <button type="submit" class="commentInput__button">
+          <span style="padding-inline: 0.5rem">
+            <i class="fa-regular fa-paper-plane"></i>
+          </span>
+        </button>
+      </form>
+
+      {% endif %}
+
+      <!--  -->
+
+      {% for comment in post.comment_set.all|dictsortreversed:"created_at" %}
+      <!--  -->
 
       <div class="commentCard">
         <div class="commentCard__header">
           <img
             class="commentCard__avatar"
-            src="{% static 'assets/default_profile_pic.jpg' %}"
+            src="{{ comment.user.profile.image.url }}?t={{ comment.user.profile.created_at  | date:'jmYHisu' }}"
           />
-          <p class="commentCard__username">Username</p>
-          <p class="commentCard__time">2 min ago</p>
+          <p class="commentCard__username">{{ comment.user.username }}</p>
+          <p class="commentCard__time">{{ comment.created_at|timesince }}</p>
         </div>
         <div style="margin-left: 2.6rem">
-          <p class="commentCard__post">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vitae
-            consequatur quam commodi esse, dolorum deleniti voluptates in
-            explicabo ullam cum! Itaque, ratione beatae quaerat numquam ab nobis
-            dolores expedita atque.
-          </p>
+          <p class="commentCard__post">{{ comment.content }}</p>
 
           <i class="fa-regular fa-heart" style="margin-bottom: 1rem"></i
-          >&nbsp;&nbsp;2
+          >&nbsp;&nbsp;{{ comment.like_comment_set.all.count }}
         </div>
       </div>
 
-      <a href="#" style="color: rgb(74, 74, 74); text-decoration: none"
-        >View more comments (21)</a
+      {% if forloop.first and post.comment_set.all.count > 1 %}
+      <div data-postId="{{ post.id }}" style="display: none">
+        <!--  -->
+        {% endif %}
+
+        <!--  -->
+        {% if forloop.last and post.comment_set.all.count > 1 %}
+      </div>
+      {% endif %} {% endfor %}
+
+      <!--  -->
+      {% if post.comment_set.all.count > 1 %}
+      <a
+        href="#"
+        class="view-more-comment"
+        data-postId="{{ post.id }}"
+        data-commentCount="{{ post.comment_set.all.count }}"
+        style="color: rgb(74, 74, 74); text-decoration: none"
+        >View more comments ({{ post.comment_set.all.count }})</a
       >
+      {% endif %}
     </div>
-
-    <div class="postCard">
-      <div class="postCard__header">
-        <img
-          class="postCard__avatar"
-          src="{% static 'assets/default_profile_pic.jpg' %}"
-        />
-
-        <div>
-          <p class="postCard__username">Username</p>
-          <p class="postCard__time">2 min ago</p>
-        </div>
-
-        <i class="fa-solid fa-ellipsis-vertical"></i>
-      </div>
-
-      <p class="postCard__post">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vitae
-        consequatur quam commodi esse, dolorum deleniti voluptates in explicabo
-        ullam cum! Itaque, ratione beatae quaerat numquam ab nobis dolores
-        expedita atque.
-      </p>
-
-      <i class="fa-regular fa-heart" style="margin-bottom: 1rem"></i
-      >&nbsp;&nbsp;3
-
-      <div class="commentInput">
-        <input type="text" placeholder="Add your comment" />
-        <span style="padding-inline: 0.5rem">
-          <i class="fa-regular fa-paper-plane"></i>
-        </span>
-      </div>
-
-      <div class="commentCard">
-        <div class="commentCard__header">
-          <img
-            class="commentCard__avatar"
-            src="{% static 'assets/default_profile_pic.jpg' %}"
-          />
-          <p class="commentCard__username">Username</p>
-          <p class="commentCard__time">2 min ago</p>
-        </div>
-        <div style="margin-left: 2.6rem">
-          <p class="commentCard__post">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vitae
-            consequatur quam commodi esse, dolorum deleniti voluptates in
-            explicabo ullam cum! Itaque, ratione beatae quaerat numquam ab nobis
-            dolores expedita atque.
-          </p>
-
-          <i class="fa-regular fa-heart" style="margin-bottom: 1rem"></i
-          >&nbsp;&nbsp;2
-        </div>
-      </div>
-
-      <a href="#" style="color: rgb(74, 74, 74); text-decoration: none"
-        >View more comments (21)</a
-      >
-    </div>
+    {% endfor %}
   </main>
 </div>
 
@@ -486,13 +469,15 @@
   };
 
   const postInput = document.querySelector("#post_input");
-  postInput.oninput = (ev) => {
-    if (postInput.value !== "") {
-      postInput.dataset.hasValue = true;
-    } else {
-      postInput.dataset.hasValue = false;
-    }
-  };
+  if (postInput) {
+    postInput.oninput = (ev) => {
+      if (postInput.value !== "") {
+        postInput.dataset.hasValue = true;
+      } else {
+        postInput.dataset.hasValue = false;
+      }
+    };
+  }
 
   const hamburger = document.querySelector(".hamburger");
   const close = document.querySelector(".close");
@@ -503,5 +488,25 @@
   close.onclick = () => {
     menu.dataset.isOpen = false;
   };
+
+  const viewMoreComment = document.querySelectorAll(".view-more-comment");
+  viewMoreComment.forEach((el) => {
+    el.onclick = (ev) => {
+      ev.preventDefault();
+
+      const moreCommentsEl = document.querySelector(
+        `div[data-postId='${el.dataset.postid}']`
+      );
+      if (moreCommentsEl) {
+        if (moreCommentsEl.style.display === "block") {
+          moreCommentsEl.style.display = "none";
+          el.innerText = `View more comments (${el.dataset.commentcount})`;
+        } else {
+          moreCommentsEl.style.display = "block";
+          el.innerText = "Show less";
+        }
+      }
+    };
+  });
 </script>
 {% endblock script %}
