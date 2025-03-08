@@ -1,0 +1,11 @@
+services:
+  app:
+    container_name: share_thought
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
+ 
