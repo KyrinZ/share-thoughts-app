@@ -1,1 +1,0 @@
-web: gunicorn share_thoughts.wsgi
