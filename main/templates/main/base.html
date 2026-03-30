@@ -13,14 +13,14 @@
       }
     </style> -->
   </head>
-  <body class="flex flex-col min-h-screen">
+  <body class="flex flex-col h-screen">
     {% if request.resolver_match.url_name == 'index' %}
     <div
       class="flex items-center w-full px-4 md:px-8 lg:px-10 py-4 bg-[#e2e2e2]"
     >
       <div class="w-1/3">
         <a href="{% url 'index' %}">
-          <img src="{% static 'main/assets/logoipsum-244.svg' %}" alt="logo" />
+          <img class="w-24" src="{% static 'main/assets/logo.png' %}" alt="logo" />
         </a>
       </div>
       <input
@@ -38,11 +38,12 @@
     >
       <div class="w-1/3">
         <a href="{% url 'index' %}">
-          <img src="{% static 'main/assets/logoipsum-244.svg' %}" alt="logo" />
+          <img class="w-24" src="{% static 'main/assets/logo.png' %}" alt="logo" />
         </a>
       </div>
     </div>
     {% endif %}
+    
     <div class="flex flex-1">
       <!-- Sidebar -->
       <nav class="w-1/5 bg-[#f9f9f9] px-4 md:px-8 lg:px-10 py-4">
