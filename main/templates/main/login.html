@@ -17,9 +17,9 @@
       x-data="{
         current: 0,
         images: [
-          '{% static "images/slide1.jpg" %}',
-          '{% static "images/slide2.jpg" %}',
-          '{% static "images/slide3.jpg" %}'
+          '{% static "main/assets/image1.svg" %}',
+          '{% static "main/assets/image2.svg" %}',
+          '{% static "main/assets/image3.svg" %}'
         ]
       }"
       x-init="setInterval(() => current = (current + 1) % images.length, 3000)"
@@ -34,9 +34,7 @@
       </template>
 
       <div class="absolute inset-0 bg-white/60 flex items-center justify-center">
-        <h1 class="text-3xl font-semibold text-center px-6 text-gray-900">
-          Welcome back
-        </h1>
+        <img class="w-1/2" src="{% static 'main/assets/logo.png' %}" alt="logo" />
       </div>
     </div>
 
