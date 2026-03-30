@@ -1,0 +1,56 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h2 class="text-2xl font-bold mb-4">Notifications</h2>
+
+<div class="flex flex-col gap-4">
+
+  <!-- Example Notification Item -->
+  <div class="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition">
+    <img class="w-12 h-12 rounded-full object-cover" src="{% static 'main/assets/default.svg' %}" alt="user avatar">
+    <div class="flex-1">
+      <p class="text-gray-800">
+        <span class="font-bold">Jane Doe</span> liked your post.
+      </p>
+      <span class="text-sm text-gray-400">2 hours ago</span>
+    </div>
+  </div>
+
+  <div class="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition">
+    <img class="w-12 h-12 rounded-full object-cover" src="{% static 'main/assets/default.svg' %}" alt="user avatar">
+    <div class="flex-1">
+      <p class="text-gray-800">
+        <span class="font-bold">John Smith</span> commented on your post.
+      </p>
+      <span class="text-sm text-gray-400">5 hours ago</span>
+    </div>
+  </div>
+
+  <div class="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition">
+    <img class="w-12 h-12 rounded-full object-cover" src="{% static 'main/assets/default.svg' %}" alt="user avatar">
+    <div class="flex-1">
+      <p class="text-gray-800">
+        <span class="font-bold">Alice</span> started following you.
+      </p>
+      <span class="text-sm text-gray-400">1 day ago</span>
+    </div>
+  </div>
+
+  <!-- Add more notifications dynamically -->
+  {% for notification in notifications %}
+  <div class="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition">
+    <img class="w-12 h-12 rounded-full object-cover" src="{{ notification.user.profile_image.url|default:'{% static "main/assets/default.svg" %}' }}" alt="user avatar">
+    <div class="flex-1">
+      <p class="text-gray-800">
+        <span class="font-bold">{{ notification.user.username }}</span> {{ notification.message }}
+      </p>
+      <span class="text-sm text-gray-400">{{ notification.created_at|timesince }} ago</span>
+    </div>
+  </div>
+  {% endfor %}
+
+</div>
+
+{% endblock %}

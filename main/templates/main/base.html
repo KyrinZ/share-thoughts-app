@@ -1,0 +1,127 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Share Thought</title>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+  </head>
+  <body class="flex flex-col min-h-screen">
+    <div
+      class="flex items-center w-full px-4 md:px-8 lg:px-10 py-4 bg-[#e2e2e2]"
+    >
+      <div class="w-1/3">
+        <img src="{% static 'main/assets/logoipsum-244.svg' %}" alt="logo" />
+      </div>
+      <input
+        class="w-1/3 p-2 rounded-md bg-white focus:outline-none"
+        type="text"
+        placeholder="Search..."
+      />
+    </div>
+    <div class="flex flex-1">
+      <!-- Sidebar -->
+      <nav class="w-1/5 bg-[#f9f9f9] px-4 md:px-8 lg:px-10 py-4">
+        <ul class="flex flex-col gap-4 h-full">
+          <li>
+            <a class="flex gap-2" href="{% url 'index' %}">
+              <img
+                src="{% static 'main/assets/layout-dashboard.svg' %}"
+                alt="home icon"
+              />
+              Home
+            </a>
+          </li>
+          <li>
+            <a class="flex gap-2" href="{% url 'messages' %}">
+              <img
+                src="{% static 'main/assets/message-square.svg' %}"
+                alt="messages icon"
+              />
+              Messages
+            </a>
+          </li>
+          <li>
+            <a class="flex gap-2" href="{% url 'notifications' %}">
+              <img
+                src="{% static 'main/assets/bell.svg' %}"
+                alt="notifications icon"
+              />
+              Notifications
+            </a>
+          </li>
+          <li class="mt-auto">
+            <a class="flex gap-2" href="{% url 'profile' %}">
+              <img
+                src="{% static 'main/assets/circle-user-round.svg' %}"
+                alt="profile icon"
+              />
+              Profile
+            </a>
+          </li>
+          <li>
+            <a class="flex gap-2" href="{% url 'login' %}">
+              <img
+                src="{% static 'main/assets/log-out.svg' %}"
+                alt="logout icon"
+              />
+              Logout
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <main class="flex-1 overflow-y-auto px-4 md:px-8 py-4">
+        {% block content %}{% endblock %}
+      </main>
+
+      <div class="w-1/5 bg-[#f9f9f9] px-4 md:px-8 lg:pr-10 py-4">
+        <h3 class="mb-2 text-xl font-extrabold">Trending</h3>
+
+        <ul class="flex flex-col gap-2 mb-4">
+          <li>
+            <a class="" href="#">
+              #Vue <span class="text-xs block">482K posts</span>
+            </a>
+          </li>
+          <li>
+            <a class="" href="#">
+              #React <span class="text-xs block">482K posts</span>
+            </a>
+          </li>
+          <li>
+            <a class="" href="#">
+              #Angular <span class="text-xs block">482K posts</span>
+            </a>
+          </li>
+        </ul>
+        <h3 class="mb-4 text-xl font-extrabold">Suggestions</h3>
+        <ul>
+          <li>
+            <div class="flex items-center gap-2">
+              <img
+                class="w-10 h-10 rounded-full border border-gray-500 object-cover object-[center_2px]"
+                src="{% static 'main/assets/default.svg' %}"
+                alt="logo"
+              />
+              <div class="flex-1">
+                <p class="font-bold">John Doe</p>
+                <p class="text-sm text-gray-400">@JohnDoe</p>
+              </div>
+              <button class="px-4 py-2 bg-[#6D6D6D] text-white rounded-full">
+                Follow
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,107 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Share Thought</title>
+
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  </head>
+
+  <body class="min-h-screen flex bg-gray-100 text-gray-800">
+
+    <!-- LEFT: Carousel -->
+    <div 
+      x-data="{
+        current: 0,
+        images: [
+          '{% static "images/slide1.jpg" %}',
+          '{% static "images/slide2.jpg" %}',
+          '{% static "images/slide3.jpg" %}'
+        ]
+      }"
+      x-init="setInterval(() => current = (current + 1) % images.length, 3000)"
+      class="hidden md:flex w-1/2 relative overflow-hidden border-r border-gray-300"
+    >
+      <template x-for="(img, index) in images" :key="index">
+        <img 
+          :src="img"
+          x-show="current === index"
+          class="absolute inset-0 w-full h-full object-cover grayscale"
+        />
+      </template>
+
+      <div class="absolute inset-0 bg-white/60 flex items-center justify-center">
+        <h1 class="text-3xl font-semibold text-center px-6 text-gray-900">
+          Welcome back
+        </h1>
+      </div>
+    </div>
+
+    <!-- RIGHT: Login Form -->
+    <div class="flex w-full md:w-1/2 items-center justify-center bg-white px-6">
+      
+      <div class="w-full max-w-md border border-gray-300 p-8 rounded-xl shadow-sm bg-white">
+
+        <h2 class="text-2xl font-semibold mb-6 text-gray-900">
+          Login
+        </h2>
+
+        <form method="POST" action="{% url 'login' %}" class="space-y-4">
+          {% csrf_token %}
+
+          <input 
+            type="text" 
+            name="username"
+            placeholder="Username or Email"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:border-gray-600"
+          />
+
+          <input 
+            type="password" 
+            name="password"
+            placeholder="Password"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white focus:outline-none focus:border-gray-600"
+          />
+
+          <div class="flex justify-between items-center text-sm">
+            <label class="flex items-center gap-2">
+              <input type="checkbox" class="border-gray-300" />
+              Remember me
+            </label>
+
+            <a href="#" class="underline hover:text-black">
+              Forgot password?
+            </a>
+          </div>
+
+          <button 
+            type="submit"
+            class="w-full border border-gray-800 text-gray-900 py-2 rounded-lg hover:bg-gray-900 hover:text-white transition"
+          >
+            Login
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="my-6 flex items-center">
+          <div class="flex-grow h-px bg-gray-300"></div>
+          <span class="px-3 text-gray-500 text-sm">OR</span>
+          <div class="flex-grow h-px bg-gray-300"></div>
+        </div>
+
+        <!-- Register link -->
+        <p class="text-sm text-gray-600 text-center">
+          Don't have an account?
+          <a href="{% url 'register' %}" class="font-medium underline hover:text-black">
+            Register
+          </a>
+        </p>
+
+      </div>
+    </div>
+
+  </body>
+</html>
