@@ -180,8 +180,7 @@
                     <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-tighter" x-text="`@${post.author.username} · ${timeSince(post.created_at)}`"></p>
                   </div>
 
-                  </div>
- 
+
                   <div class="ml-auto relative" x-show="post.author.username === currentUser">
                     <button @click="post.showOptions = !post.showOptions">
                       <img class="w-6 h-6 opacity-30 hover:opacity-100" src="{% static 'main/assets/ellipsis.svg' %}" alt="logo" />
