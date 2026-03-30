@@ -1,188 +1,561 @@
 {% extends "main/base.html" %} 
 {% load static %}
 {% block content %}
-<form action="#" class="p-4 w-full flex gap-4">
+<div x-data="postFeed()">
+
+<!-- AUTHENTICATION MODAL -->
+<div x-show="showAuthModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" @click.self="showAuthModal = false">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+    <h2 class="text-2xl font-bold mb-4">Sign In Required</h2>
+    <p class="text-gray-600 mb-6">You need to be logged in to like, comment, or share thoughts.</p>
+    <div class="flex flex-col gap-3">
+       <a href="{% url 'login' %}" class="w-full py-2 bg-gray-900 text-white rounded-lg hover:bg-black block font-semibold transition">Login or Create Account</a>
+       <button @click="showAuthModal = false" class="w-full py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-semibold transition">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div x-show="showShareModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" @click.self="cancelShare">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+    <h2 class="text-xl font-bold mb-4">Share this thought</h2>
+    <div class="mb-4">
+      <textarea x-model="shareQuote" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-900 resize-none h-24" placeholder="Add a quote (optional)..."></textarea>
+    </div>
+    
+    <!-- Mini Preview of the post being shared -->
+    <template x-if="postToShare">
+      <div class="p-3 border border-gray-200 rounded-lg mb-4 bg-gray-50 flex items-start gap-3">
+        <img :src="postToShare.original_post ? postToShare.original_post.author.avatar : postToShare.author.avatar" class="w-8 h-8 rounded-full border border-gray-300 object-cover">
+        <div>
+           <p class="font-bold text-sm" x-text="postToShare.original_post ? postToShare.original_post.author.display_name : postToShare.author.display_name"></p>
+           <p class="text-xs text-gray-700 line-clamp-2" x-text="postToShare.original_post ? postToShare.original_post.content : postToShare.content"></p>
+        </div>
+      </div>
+    </template>
+    
+    <div class="flex justify-end gap-2">
+       <button @click="cancelShare" class="px-5 py-2 text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100 font-semibold text-sm transition">Cancel</button>
+       <button @click="submitShare" class="px-5 py-2 bg-gray-900 text-white rounded-full hover:bg-black font-semibold text-sm transition">Share thought</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST CREATION FORM -->
+{% if user.is_authenticated %}
+<form @submit="submitPost" class="p-4 w-full flex gap-4 bg-white border border-gray-200 rounded-md mb-4 shadow-sm">
   <img
     class="w-10 h-10 rounded-full border border-gray-500 object-cover object-[center_2px]"
-    src="{% static 'main/assets/default.svg' %}"
+    src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}/static/main/assets/default.svg{% endif %}"
     alt="logo"
   />
   <div class="flex-1">
     <textarea
-      class="border border-gray-300 rounded-md p-2 w-full focus:outline-none mb-1"
+      x-model="postContent"
+      class="border border-gray-300 rounded-md p-2 w-full focus:outline-none mb-1 bg-white whitespace-pre-wrap"
       placeholder="Share something..."
-      name=""
-      id=""
+      rows="2"
     ></textarea>
-    <div class="flex items-start justify-between">
-      <div class="flex gap-1">
-        <img
-          class="w-6 h-6"
-          src="{% static 'main/assets/camera.svg' %}"
-          alt="logo"
-        />
-        <img
-          class="w-6 h-6"
-          src="{% static 'main/assets/video.svg' %}"
-          alt="logo"
-        />
+    
+    <!-- Media Preview -->
+    <div x-show="postMedia.length > 0" class="flex gap-2 overflow-x-auto mb-2 py-2">
+       <template x-for="(src, idx) in postMedia" :key="idx">
+          <img :src="src" class="h-20 w-20 object-cover rounded border border-gray-300">
+       </template>
+    </div>
+
+    <div class="flex items-start justify-between mt-2">
+      <div class="flex gap-2">
+        <label class="cursor-pointer">
+          <img class="w-6 h-6 hover:opacity-75 transition" src="{% static 'main/assets/camera.svg' %}" alt="logo" />
+          <input type="file" multiple class="hidden" x-ref="mediaInput" accept="image/*,video/*" @change="handleMediaSelect">
+        </label>
+        <label class="cursor-pointer">
+          <img class="w-6 h-6 hover:opacity-75 transition" src="{% static 'main/assets/video.svg' %}" alt="logo" />
+          <input type="file" multiple class="hidden" x-ref="videoInput" accept="video/*" @change="handleMediaSelect">
+        </label>
       </div>
 
-      <button class="px-6 py-1 bg-[#6D6D6D] text-white rounded-full">
+      <button type="submit" class="px-6 py-1 bg-[#6D6D6D] font-medium text-white rounded-full hover:bg-black transition">
         Post
       </button>
     </div>
   </div>
 </form>
-<div class="flex flex-col gap-4 mt-4">
-  <div class="bg-[#f4f4f4] rounded-md">
-    <div class="flex items-center gap-4 p-4">
-      <img
-        class="w-10 h-10 rounded-full border border-gray-500 object-cover object-[center_2px]"
-        src="{% static 'main/assets/default.svg' %}"
-        alt="logo"
-      />
-      <p class="font-semibold">
-        John Doe
-        <span class="text-sm text-gray-500">
-          posted a new thought 2 hours ago
-        </span>
-        <span class="text-sm block text-gray-500">@johndoe</span>
-      </p>
+{% endif %}
 
-      <div class="ml-auto">
-        <button>
-          <img
-            class="w-6 h-6"
-            src="{% static 'main/assets/ellipsis.svg' %}"
-            alt="logo"
-          />
-        </button>
-      </div>
-    </div>
+<!-- FEED RENDERING -->
+<div class="flex flex-col gap-4 mt-4 relative min-h-[200px]">
+  <!-- Loading Spinner -->
+  <div x-show="loading" class="absolute inset-0 flex items-start justify-center pt-10 bg-transparent z-10 transition">
+     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+  </div>
 
-    <div class="px-6 mb-4">
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos officiis,
-        voluptates quae impedit quisquam quia. Quisquam officiis quidem quos,
-        quae quia quibusdam quod quas quia quibusdam quod quas quia quibusdam
-        quod quas quia quibusdam quod quas quia quibusdam quod quas quia
-        quibusdam quod quas quia quibusdam quod quas quia quibusdam quod quas
-        quia quibusdam quod quas quia quibusdam quod quas quia quibusdam quod
-        quas quia
-      </p>
-    </div>
+  <!-- Empty State -->
+  <div x-show="!loading && posts.length === 0" style="display: none;" class="text-center py-16 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 items-center justify-center flex flex-col">
+     <p class="text-gray-900 font-bold text-lg mb-1">Nothing to see here right now</p>
+     <p class="text-sm text-gray-500">Be the first to share your thoughts, or try a different search query!</p>
+  </div>
 
-    <div class="flex items-center gap-4 px-4 mb-4">
-      <button class="flex items-center gap-1 text-sm">
+  <template x-for="post in posts" :key="post.id">
+    <div class="bg-[#f4f4f4] rounded-md shadow-sm border border-gray-200 relative">
+      <!-- Header -->
+      <div class="flex items-center gap-4 p-4">
         <img
-          class="w-6 h-6"
-          src="{% static 'main/assets/heart.svg' %}"
-          alt="logo"
-        />
-        <span>Like</span>
-      </button>
-      <button class="flex items-center gap-1 text-sm">
-        <img
-          class="w-6 h-6"
-          src="{% static 'main/assets/message-circle.svg' %}"
-          alt="logo"
-        />
-        <span>Comment</span>
-      </button>
-      <button class="flex items-center gap-1 text-sm">
-        <img
-          class="w-6 h-6"
-          src="{% static 'main/assets/forward.svg' %}"
-          alt="logo"
-        />
-        <span>Share</span>
-      </button>
-
-      <p class="ml-auto text-sm text-gray-500">
-        1k likes . 2 comments . 3 shares
-      </p>
-    </div>
-
-    <div class="px-4">
-      <div class="flex items-center gap-2 p-4">
-        <img
-          class="w-8 h-8 rounded-full border border-gray-500 object-cover object-[center_2px]"
-          src="{% static 'main/assets/default.svg' %}"
-          alt="logo"
+          class="w-10 h-10 rounded-full border border-gray-500 object-cover object-[center_2px]"
+          :src="post.author.avatar"
+          alt="avatar"
         />
         <p class="font-semibold">
-          John Doe
-
-          <span class="text-sm block text-gray-500">@johndoe</span>
+          <span x-text="post.author.display_name"></span>
+          <span class="text-xs text-gray-500 ml-1">
+             posted <span x-text="timeSince(post.created_at)"></span>
+             <span x-show="post.is_edited" class="italic">(edited)</span>
+          </span>
+          <span class="text-sm block text-gray-500" x-text="`@${post.author.username}`"></span>
         </p>
 
-        <div class="ml-auto flex items-center gap-2">
-          <p class="text-sm text-gray-500">2 hours ago</p>
-          <button>
-            <img
-              class="w-5 h-5"
-              src="{% static 'main/assets/ellipsis.svg' %}"
-              alt="logo"
-            />
+        <!-- Post Options Matrix -->
+        <div class="ml-auto relative" x-show="post.author.username === currentUser">
+          <button @click="post.showOptions = !post.showOptions">
+            <img class="w-6 h-6" src="{% static 'main/assets/ellipsis.svg' %}" alt="logo" />
           </button>
+          <div x-show="post.showOptions" @click.away="post.showOptions = false" class="absolute right-0 mt-2 bg-white border border-gray-300 rounded shadow-md w-24 overflow-hidden z-10" style="display:none;">
+             <button @click="post.isEditing = true; post.showOptions = false" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm font-semibold text-gray-700">Edit</button>
+             <button @click="deletePost(post.id)" class="w-full text-left px-4 py-2 hover:bg-gray-200 text-black font-bold text-sm">Delete</button>
+          </div>
         </div>
       </div>
 
+      <!-- General Post Content -->
       <div class="px-6 mb-4">
-        <p class="text-sm">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos
-          officiis, voluptates quae impedit quisquam quia. Quisquam officiis
-          quidem quos, quae quia quibusdam quod quas quia quibusdam quod quas
-          quia quibusdam quod quas quia
-        </p>
+        <div x-show="!post.isEditing">
+          <p class="whitespace-pre-wrap text-gray-900" x-text="post.content"></p>
+        </div>
+        
+        <!-- Post Edit Field -->
+        <div x-show="post.isEditing" class="flex flex-col gap-2" style="display:none;">
+           <textarea x-model="post.editContent" class="w-full p-2 border border-gray-300 rounded bg-white whitespace-pre-wrap focus:outline-none"></textarea>
+           <div class="flex justify-end gap-2 mt-1">
+              <button @click="post.isEditing = false" class="px-4 py-1 border border-gray-400 font-semibold rounded hover:bg-gray-200 text-sm">Cancel</button>
+              <button @click="savePostEdit(post)" class="px-4 py-1 bg-gray-900 font-semibold text-white rounded hover:bg-black text-sm">Save</button>
+           </div>
+        </div>
+
+        <!-- Quote Share Visualization -->
+        <template x-if="post.original_post">
+          <div class="mt-4 border border-gray-300 rounded-lg p-4 bg-white/70">
+             <div class="flex items-center gap-2 mb-2">
+                 <img :src="post.original_post.author.avatar" class="w-6 h-6 rounded-full border border-gray-400 object-cover">
+                 <span class="font-bold text-sm" x-text="post.original_post.author.display_name"></span>
+                 <span class="text-xs text-gray-500" x-text="`@${post.original_post.author.username} · ${timeSince(post.original_post.created_at)}`"></span>
+             </div>
+             <p class="whitespace-pre-wrap text-sm text-gray-800" x-text="post.original_post.content"></p>
+             <template x-if="post.original_post.media && post.original_post.media.length > 0">
+                 <div class="flex gap-2 overflow-x-auto mt-3">
+                    <template x-for="m in post.original_post.media">
+                      <img x-show="m.type === 'image'" :src="m.url" class="h-32 object-cover rounded border border-gray-300">
+                    </template>
+                 </div>
+             </template>
+          </div>
+        </template>
+
+        <!-- Media Display Gallery -->
+        <template x-if="post.media && post.media.length > 0">
+           <div class="flex gap-2 overflow-x-auto mt-4 py-2">
+              <template x-for="img in post.media">
+                 <img x-show="img.type==='image'" :src="img.url" class="h-48 object-cover rounded-md border border-gray-300">
+              </template>
+           </div>
+        </template>
       </div>
 
-      <div class="flex gap-4 px-4">
-        <button class="flex items-center gap-1 text-sm">
-          <img
-            class="w-5 h-5"
-            src="{% static 'main/assets/heart.svg' %}"
-            alt="logo"
-          />
+      <!-- Action Panel -->
+      <div class="flex items-center gap-4 px-4 mb-4 select-none">
+        <button @click="toggleLike(post)" class="flex items-center gap-1 text-sm transition font-medium" :class="post.user_liked ? 'text-red-500 font-bold' : 'text-gray-600 hover:text-black'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 transition duration-200" :class="post.user_liked ? 'fill-current text-red-500 stroke-red-500 scale-110' : 'text-gray-900 opacity-70'">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+          </svg>
           <span>Like</span>
         </button>
-        <p class="ml-auto text-sm text-gray-500">1k likes</p>
+        <button @click="toggleComments(post)" class="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-black transition">
+          <img class="w-6 h-6 opacity-70" src="{% static 'main/assets/message-circle.svg' %}" alt="logo" />
+          <span>Comment</span>
+        </button>
+        <button @click="triggerShare(post)" class="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-black transition">
+          <img class="w-6 h-6 opacity-70" src="{% static 'main/assets/forward.svg' %}" alt="logo" />
+          <span>Share</span>
+        </button>
+
+        <p class="ml-auto text-sm font-semibold text-gray-500">
+          <span x-text="post.likes_count"></span> likes &middot; 
+          <span x-text="post.comments_count"></span> comments
+        </p>
+      </div>
+
+      <!-- Comments Segment -->
+      <div x-show="post.showComments" style="display: none;" class="border-t border-gray-200">
+        <div class="max-h-96 overflow-y-auto">
+          <template x-for="cmt in post.comments" :key="cmt.id">
+            <div class="px-4 border-b border-gray-100 last:border-0 hover:bg-black/5 transition">
+              <div class="flex items-center gap-2 pt-4 pb-2">
+                <img
+                  class="w-8 h-8 rounded-full border border-gray-400 object-cover object-[center_2px]"
+                  :src="cmt.author.avatar"
+                  alt="logo"
+                />
+                <p class="font-semibold text-sm">
+                  <span x-text="cmt.author.display_name"></span>
+                  <span class="text-xs font-normal text-gray-500 ml-1" x-text="`@${cmt.author.username}`"></span>
+                </p>
+
+                <div class="ml-auto flex items-center gap-2 relative" >
+                  <span x-show="cmt.is_edited" class="text-[10px] font-semibold text-gray-400 bg-gray-100 px-1 rounded uppercase tracking-wider">edited</span>
+                  <p class="text-xs text-gray-400" x-text="timeSince(cmt.created_at)"></p>
+                  
+                  <template x-if="cmt.author.username === currentUser">
+                    <div>
+                      <button @click="cmt.showOptions = !cmt.showOptions">
+                        <img class="w-4 h-4 ml-1 opacity-60 hover:opacity-100" src="{% static 'main/assets/ellipsis.svg' %}" alt="logo" />
+                      </button>
+                      <div x-show="cmt.showOptions" @click.away="cmt.showOptions = false" class="absolute right-0 mt-2 bg-white border border-gray-300 rounded shadow-md w-24 overflow-hidden z-10" style="display:none;">
+                         <button @click="cmt.isEditing = true; cmt.showOptions = false" class="w-full text-left px-4 py-2 hover:bg-gray-100 font-semibold text-gray-700 text-sm">Edit</button>
+                         <button @click="deleteComment(post, cmt)" class="w-full text-left px-4 py-2 hover:bg-gray-200 text-black font-bold text-sm">Delete</button>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Sub-content -->
+              <div class="px-[40px] pb-4">
+                 <div x-show="!cmt.isEditing">
+                    <p class="text-sm whitespace-pre-wrap text-gray-800" x-text="cmt.content"></p>
+                    
+                    <!-- Comment Actions Panel -->
+                    <div class="flex items-center gap-4 mt-2">
+                      <button @click="toggleCommentLike(post, cmt)" class="flex items-center gap-1 text-xs font-medium transition" :class="cmt.user_liked ? 'text-red-500' : 'text-gray-500 hover:text-black'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 transition duration-200" :class="cmt.user_liked ? 'fill-current stroke-red-500 scale-110' : ''">
+                          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+                        </svg>
+                        <span x-show="cmt.likes_count > 0" x-text="cmt.likes_count"></span>
+                      </button>
+                    </div>
+                 </div>
+                 
+                 <!-- Edit Editor -->
+                 <div x-show="cmt.isEditing" class="flex flex-col gap-2 mt-2" style="display:none;">
+                    <textarea x-model="cmt.editContent" class="w-full p-2 border border-gray-300 rounded bg-white whitespace-pre-wrap text-sm focus:outline-none"></textarea>
+                    <div class="flex justify-end gap-2 mt-1">
+                       <button @click="cmt.isEditing = false" class="px-3 py-1 border border-gray-400 font-semibold rounded hover:bg-gray-200 text-xs">Cancel</button>
+                       <button @click="saveCommentEdit(cmt)" class="px-3 py-1 bg-gray-900 font-semibold text-white rounded hover:bg-black text-xs">Save</button>
+                    </div>
+                 </div>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- Submission Ribbon -->
+        <form @submit.prevent="submitComment(post)" class="p-4 w-full flex gap-3 bg-gray-50 border-t border-gray-200 items-start">
+          <img
+            class="w-8 h-8 rounded-full border border-gray-400 object-cover object-[center_2px]"
+            src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}/static/main/assets/default.svg{% endif %}"
+            alt="logo"
+          />
+          <div class="flex-1">
+            <textarea
+              x-model="post.newComment"
+              class="border border-gray-300 shadow-sm rounded-md p-2 w-full focus:ring-1 focus:ring-black focus:outline-none mb-1 text-sm bg-white whitespace-pre-wrap"
+              placeholder="Write a comment..."
+              rows="1"
+            ></textarea>
+            <div class="flex items-start justify-end mt-1">
+              <button type="submit" class="px-5 py-1.5 bg-[#6D6D6D] border border-[#6D6D6D] font-medium text-white rounded-full text-sm hover:bg-black hover:border-black transition">
+                Comment
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
-    <form action="#" class="p-4 w-full flex gap-4">
-      <img
-        class="w-8 h-8 rounded-full border border-gray-500 object-cover object-[center_2px]"
-        src="{% static 'main/assets/default.svg' %}"
-        alt="logo"
-      />
-      <div class="flex-1">
-        <textarea
-          class="border border-gray-300 rounded-md p-2 w-full focus:outline-none mb-1 bg-white"
-          placeholder="Comment here..."
-          name=""
-          id=""
-        ></textarea>
-        <div class="flex items-start justify-between">
-          <div class="flex gap-1">
-            <img
-              class="w-6 h-6"
-              src="{% static 'main/assets/camera.svg' %}"
-              alt="logo"
-            />
-            <img
-              class="w-6 h-6"
-              src="{% static 'main/assets/video.svg' %}"
-              alt="logo"
-            />
-          </div>
-
-          <button class="px-6 py-1 bg-[#6D6D6D] text-white rounded-full">
-            Comment
-          </button>
-        </div>
-      </div>
-    </form>
-  </div>
+  </template>
 </div>
+</div>
+
+<script>
+function postFeed() {
+  return {
+    posts: [],
+    loading: true,
+    currentUser: '{{ user.username|default:"" }}',
+    searchQuery: '',
+    hashtagFilter: '',
+    postContent: '',
+    postMedia: [],
+    showAuthModal: false,
+    
+    // Share feature specific state
+    showShareModal: false,
+    postToShare: null,
+    shareQuote: '',
+    
+    init() {
+      this.fetchPosts();
+      
+      window.addEventListener('search-triggered', (e) => {
+        this.searchQuery = e.detail;
+        this.fetchPosts();
+      });
+      
+      window.addEventListener('hashtag-triggered', (e) => {
+        this.hashtagFilter = this.hashtagFilter === e.detail ? '' : e.detail;
+        this.fetchPosts();
+      });
+    },
+    
+    fetchPosts() {
+      this.loading = true;
+      let url = '/api/posts/?';
+      if (this.searchQuery) url += 'search=' + encodeURIComponent(this.searchQuery) + '&';
+      if (this.hashtagFilter) url += 'hashtag=' + encodeURIComponent(this.hashtagFilter);
+      
+      fetch(url)
+        .then(r => r.json())
+        .then(data => {
+          this.posts = data.posts.map(p => ({
+            ...p,
+            showOptions: false,
+            showComments: false,
+            comments: [],
+            newComment: '',
+            isEditing: false,
+            editContent: p.content
+          }));
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+
+    submitPost(e) {
+      if (!this.currentUser) return this.showAuthModal = true;
+      e.preventDefault();
+      
+      let fd = new FormData();
+      fd.append('content', this.postContent);
+      
+      const fileInput = this.$refs.mediaInput;
+      if (fileInput.files.length > 0) {
+        for (let i = 0; i < fileInput.files.length; i++) {
+          let file = fileInput.files[i];
+          if (file.type.startsWith('image/')) fd.append('images', file);
+          if (file.type.startsWith('video/')) fd.append('videos', file);
+        }
+      }
+      
+      fetch('/api/posts/', {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        body: fd
+      }).then(r => r.json()).then(data => {
+        if(data.post) {
+          let p = data.post;
+          p.showOptions = false; p.showComments = false; p.comments = []; p.newComment = ''; p.isEditing = false; p.editContent = p.content;
+          this.posts.unshift(p);
+          this.postContent = '';
+          this.postMedia = [];
+          fileInput.value = '';
+          this.$refs.videoInput.value = '';
+        } else if(data.error) {
+            alert(data.error);
+        }
+      });
+    },
+
+    handleMediaSelect(e) {
+      this.postMedia = [];
+      Array.from(e.target.files).concat(Array.from(this.$refs.videoInput.files || [])).forEach(file => {
+        this.postMedia.push(URL.createObjectURL(file));
+      });
+    },
+
+    toggleLike(post) {
+      if (!this.currentUser) return this.showAuthModal = true;
+      if (post.likeTimeout) clearTimeout(post.likeTimeout);
+      
+      post.user_liked = !post.user_liked;
+      post.likes_count += post.user_liked ? 1 : -1;
+      
+      post.likeTimeout = setTimeout(() => {
+        fetch(`/api/posts/${post.id}/like/`, {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        }).then(r => r.json()).then(data => {
+            post.likes_count = data.likes_count;
+            post.user_liked = data.liked;
+        });
+      }, 500); 
+    },
+    
+    toggleCommentLike(post, comment) {
+      if (!this.currentUser) return this.showAuthModal = true;
+      if (comment.likeTimeout) clearTimeout(comment.likeTimeout);
+      
+      comment.user_liked = !comment.user_liked;
+      comment.likes_count += comment.user_liked ? 1 : -1;
+      
+      comment.likeTimeout = setTimeout(() => {
+        fetch(`/api/comments/${comment.id}/like/`, {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        }).then(r => r.json()).then(data => {
+            comment.likes_count = data.likes_count;
+            comment.user_liked = data.liked;
+        });
+      }, 500); 
+    },
+    
+    deletePost(postId) {
+      if(!confirm("Are you sure you want to delete this post?")) return;
+      let fd = new FormData(); fd.append('action', 'delete');
+      fetch(`/api/posts/${postId}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        body: fd
+      }).then(r => {
+        if(r.ok) this.posts = this.posts.filter(p => p.id !== postId);
+      });
+    },
+    
+    savePostEdit(post) {
+       let fd = new FormData(); 
+       fd.append('action', 'edit');
+       fd.append('content', post.editContent);
+       fetch(`/api/posts/${post.id}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        body: fd
+      }).then(r => r.json()).then(d => {
+        if(d.post) {
+          post.content = d.post.content;
+          post.is_edited = true;
+          post.isEditing = false;
+        }
+      });
+    },
+
+    toggleComments(post) {
+       post.showComments = !post.showComments;
+       if (post.showComments && post.comments.length === 0) {
+          fetch(`/api/posts/${post.id}/comments/`).then(r => r.json())
+          .then(d => {
+             post.comments = d.comments.map(c => ({
+                 ...c, isEditing: false, editContent: c.content, showOptions: false
+             }));
+          });
+       }
+    },
+
+    submitComment(post) {
+       if (!this.currentUser) return this.showAuthModal = true;
+       if (!post.newComment) return;
+       let fd = new FormData(); fd.append('content', post.newComment);
+       fetch(`/api/posts/${post.id}/comments/`, {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          body: fd
+       }).then(r => r.json()).then(d => {
+          if (d.comment) {
+             post.comments.push({...d.comment, isEditing: false, editContent: d.comment.content, showOptions: false});
+             post.newComment = '';
+             post.comments_count++;
+          }
+       });
+    },
+
+    deleteComment(post, comment) {
+       if(!confirm("Delete this comment?")) return;
+       let fd = new FormData(); fd.append('action', 'delete');
+       fetch(`/api/comments/${comment.id}/`, {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          body: fd
+       }).then(r => {
+         if(r.ok) {
+            post.comments = post.comments.filter(c => c.id !== comment.id);
+            post.comments_count--;
+         }
+       });
+    },
+
+    saveCommentEdit(comment) {
+       let fd = new FormData(); fd.append('action', 'edit'); fd.append('content', comment.editContent);
+       fetch(`/api/comments/${comment.id}/`, {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          body: fd
+       }).then(r => r.json()).then(d => {
+          if(d.comment) {
+             comment.content = d.comment.content;
+             comment.is_edited = true;
+             comment.isEditing = false;
+          }
+       });
+    },
+
+    triggerShare(post) {
+       if (!this.currentUser) return this.showAuthModal = true;
+       this.postToShare = post;
+       this.shareQuote = '';
+       this.showShareModal = true;
+    },
+    
+    cancelShare() {
+       this.showShareModal = false;
+       setTimeout(() => { this.postToShare = null; }, 300);
+    },
+
+    submitShare() {
+       let post = this.postToShare;
+       if (!post) return;
+       
+       let fd = new FormData();
+       fd.append('content', this.shareQuote);
+       let originalId = post.original_post ? post.original_post.id : post.id;
+       fd.append('original_post_id', originalId);
+
+       fetch(`/api/posts/`, {
+          method: 'POST',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          body: fd
+       }).then(r=>r.json()).then(d => {
+          if(d.post) {
+              let p = d.post;
+              p.showOptions = false; p.showComments = false; p.comments = []; p.newComment = ''; p.isEditing = false; p.editContent = p.content;
+              this.posts.unshift(p);
+              this.cancelShare();
+          }
+       })
+    },
+
+    timeSince(dateString) {
+      const date = new Date(dateString);
+      const seconds = Math.floor((new Date() - date) / 1000);
+      let interval = seconds / 31536000;
+      if (interval > 1) return Math.floor(interval) + "y ago";
+      interval = seconds / 2592000;
+      if (interval > 1) return Math.floor(interval) + "mo ago";
+      interval = seconds / 86400;
+      if (interval > 1) return Math.floor(interval) + "d ago";
+      interval = seconds / 3600;
+      if (interval > 1) return Math.floor(interval) + "h ago";
+      interval = seconds / 60;
+      if (interval > 1) return Math.floor(interval) + "m ago";
+      return "Just now";
+    }
+  }
+}
+</script>
 {% endblock %}

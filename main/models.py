@@ -15,7 +15,7 @@ class Profile(models.Model):
 
 
 class Post(models.Model):
-    author = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='posts')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     content = models.TextField(blank=True)
 
     original_post = models.ForeignKey(
@@ -27,6 +27,7 @@ class Post(models.Model):
     )
 
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    is_edited = models.BooleanField(default=False)
 
     def is_share(self):
         return self.original_post is not None
@@ -47,15 +48,16 @@ class PostMedia(models.Model):
 
 
 class Comment(models.Model):
-    author = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
 
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    is_edited = models.BooleanField(default=False)
 
 
 class Like(models.Model):
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -64,7 +66,7 @@ class Like(models.Model):
         unique_together = ('user', 'post')
 
 class CommentLike(models.Model):
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='comment_likes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_likes')
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes')
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -87,7 +89,7 @@ class Follow(models.Model):
 
 
 class Conversation(models.Model):
-    participants = models.ManyToManyField('Profile', related_name='conversations')
+    participants = models.ManyToManyField(User, related_name='conversations')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -96,7 +98,7 @@ class Conversation(models.Model):
 
 class Message(models.Model):
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='sent_messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
 
     content = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -118,8 +120,8 @@ class Notification(models.Model):
         (SHARE, 'Share'),
     ]
 
-    recipient = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='notifications')
-    actor = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='acted_notifications')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    actor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='acted_notifications')
 
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
 
@@ -132,3 +134,11 @@ class Notification(models.Model):
 
     def __str__(self):
         return f'{self.actor} -> {self.recipient} ({self.type})'
+
+class Hashtag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    posts = models.ManyToManyField(Post, related_name='hashtags')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"#{self.name}"

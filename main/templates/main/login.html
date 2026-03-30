@@ -52,9 +52,11 @@
         {% if messages %}
         <div class="mb-4 space-y-2">
           {% for message in messages %}
-          <div class="p-3 rounded-lg text-sm {% if message.tags == 'error' %}bg-gray-900 text-white border border-gray-900{% else %}bg-gray-100 text-gray-800 border border-gray-300{% endif %}">
-            {{ message }}
-          </div>
+            {% if 'login_msg' in message.tags %}
+            <div class="p-3 rounded-lg text-sm {% if 'error' in message.tags %}bg-gray-900 text-white border border-gray-900{% else %}bg-gray-100 text-gray-800 border border-gray-300{% endif %}">
+              {{ message }}
+            </div>
+            {% endif %}
           {% endfor %}
         </div>
         {% endif %}
