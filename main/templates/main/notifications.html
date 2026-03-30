@@ -5,52 +5,56 @@
 
 <h2 class="text-2xl font-bold mb-4">Notifications</h2>
 
+{% if not notifications %}
+<div class="text-center py-16 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 flex flex-col items-center justify-center">
+  <p class="text-gray-900 font-bold text-lg mb-1">You're all caught up!</p>
+  <p class="text-sm text-gray-500">No new notifications to display right now.</p>
+</div>
+{% else %}
 <div class="flex flex-col gap-4">
-
-  <!-- Example Notification Item -->
-  <div class="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition">
-    <img class="w-12 h-12 rounded-full object-cover" src="{% static 'main/assets/default.svg' %}" alt="user avatar">
-    <div class="flex-1">
-      <p class="text-gray-800">
-        <span class="font-bold">Jane Doe</span> liked your post.
+  {% for notif in notifications %}
+  <div class="flex items-start gap-4 p-4 border border-gray-200 rounded-lg shadow-sm transition {% if not notif.is_read %}bg-blue-50 border-blue-200{% else %}bg-white hover:bg-gray-50{% endif %}">
+    
+    <a href="{% url 'profile_detail' notif.actor.username %}">
+      <img class="w-12 h-12 rounded-full object-cover border border-gray-300 hover:opacity-80 transition shadow-sm" 
+           src="{% if notif.actor.profile.avatar %}{{ notif.actor.profile.avatar.url }}{% else %}{% static 'main/assets/default.svg' %}{% endif %}" 
+           alt="user avatar">
+    </a>
+         
+    <div class="flex-1 overflow-hidden">
+      <p class="text-gray-800 text-sm">
+        <a href="{% url 'profile_detail' notif.actor.username %}" class="font-bold hover:underline">
+          {{ notif.actor.profile.display_name|default:notif.actor.username }}
+        </a>
+        {% if notif.type == 'like' %}
+           {% if notif.comment %}
+             liked your comment.
+           {% else %}
+             liked your post.
+           {% endif %}
+        {% elif notif.type == 'comment' %}
+           commented on your post.
+        {% elif notif.type == 'share' %}
+           shared your post.
+        {% elif notif.type == 'follow' %}
+           started following you.
+        {% endif %}
       </p>
-      <span class="text-sm text-gray-400">2 hours ago</span>
-    </div>
-  </div>
 
-  <div class="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition">
-    <img class="w-12 h-12 rounded-full object-cover" src="{% static 'main/assets/default.svg' %}" alt="user avatar">
-    <div class="flex-1">
-      <p class="text-gray-800">
-        <span class="font-bold">John Smith</span> commented on your post.
-      </p>
-      <span class="text-sm text-gray-400">5 hours ago</span>
-    </div>
-  </div>
+      {% if notif.post and notif.type != 'share' and notif.type != 'follow' %}
+         <p class="text-xs text-gray-500 mt-1 line-clamp-1 italic text-ellipsis">"{{ notif.post.content }}"</p>
+      {% elif notif.type == 'share' %}
+         <p class="text-xs text-gray-500 mt-2 line-clamp-2 italic flex gap-1 bg-white p-2 rounded border border-gray-200">
+            <svg class="w-4 h-4 stroke-gray-500 shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 4 4"/></svg>
+            <span class="text-gray-800">"{{ notif.post.content }}"</span>
+         </p>
+      {% endif %}
 
-  <div class="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition">
-    <img class="w-12 h-12 rounded-full object-cover" src="{% static 'main/assets/default.svg' %}" alt="user avatar">
-    <div class="flex-1">
-      <p class="text-gray-800">
-        <span class="font-bold">Alice</span> started following you.
-      </p>
-      <span class="text-sm text-gray-400">1 day ago</span>
-    </div>
-  </div>
-
-  <!-- Add more notifications dynamically -->
-  {% for notification in notifications %}
-  <div class="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition">
-    <img class="w-12 h-12 rounded-full object-cover" src="{{ notification.user.profile_image.url|default:'{% static "main/assets/default.svg" %}' }}" alt="user avatar">
-    <div class="flex-1">
-      <p class="text-gray-800">
-        <span class="font-bold">{{ notification.user.username }}</span> {{ notification.message }}
-      </p>
-      <span class="text-sm text-gray-400">{{ notification.created_at|timesince }} ago</span>
+      <span class="text-xs font-semibold text-gray-400 block mt-2">{{ notif.created_at|timesince }} ago</span>
     </div>
   </div>
   {% endfor %}
-
 </div>
+{% endif %}
 
 {% endblock %}

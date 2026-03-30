@@ -111,53 +111,75 @@
         {% block content %}{% endblock %}
       </main>
 
-      <div 
-        x-data="{
-          trending: [],
-          suggestions: [],
-          init() {
-            fetch('/api/trending/').then(r => r.json()).then(d => this.trending = d.trending || []);
-            fetch('/api/suggestions/').then(r => r.json()).then(d => this.suggestions = d.suggestions || []);
-          }
-        }"
-        class="w-1/5 bg-[#f9f9f9] px-4 md:px-8 lg:pr-10 py-4"
-      >
-        <h3 class="mb-2 text-xl font-extrabold">Trending</h3>
-        <p x-show="trending.length === 0" style="display: none;" class="text-sm text-gray-500 italic mb-4">No trending topics yet.</p>
-        <ul x-show="trending.length > 0" class="flex flex-col gap-2 mb-4">
-          <template x-for="tag in trending" :key="tag.name">
-            <li>
-              <button @click="$dispatch('hashtag-triggered', tag.name)" class="text-left hover:underline">
-                #<span x-text="tag.name"></span> 
-                <span class="text-xs block text-gray-500" x-text="`${tag.count} posts`"></span>
-              </button>
-            </li>
-          </template>
-        </ul>
-        
-        <h3 class="mb-4 text-xl font-extrabold">Suggestions</h3>
-        <p x-show="suggestions.length === 0" style="display: none;" class="text-sm text-gray-500 italic">No users have posted yet.</p>
-        <ul x-show="suggestions.length > 0">
-          <template x-for="user in suggestions" :key="user.id">
-            <li class="mb-4">
-              <div class="flex items-center gap-2">
-                <img
-                  class="w-10 h-10 rounded-full border border-gray-500 object-cover object-[center_2px]"
-                  :src="user.avatar"
-                  alt="avatar"
-                />
-                <div class="flex-1 overflow-hidden">
-                  <p class="font-bold truncate" x-text="user.display_name"></p>
-                  <p class="text-sm text-gray-400 truncate" x-text="`@${user.username}`"></p>
-                </div>
-                <button class="px-4 py-2 bg-[#6D6D6D] text-white rounded-full text-sm shrink-0">
-                  Follow
+        <div 
+          x-data="{
+            trending: [],
+            suggestions: [],
+            init() {
+              fetch('/api/trending/').then(r => r.json()).then(d => this.trending = d.trending || []);
+              fetch('/api/suggestions/').then(r => r.json()).then(d => this.suggestions = d.suggestions || []);
+            },
+            toggleFollow(user) {
+              if (!'{{ request.user.is_authenticated|yesno:'true,' }}') {
+                window.location.href = '{% url 'login' %}';
+                return;
+              }
+              fetch(`/api/follow/${user.id}/`, {
+                  method: 'POST',
+                  headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+              }).then(r => r.json()).then(data => {
+                  user.is_following = data.following;
+                  if(data.following) {
+                    setTimeout(() => {
+                      this.suggestions = this.suggestions.filter(s => s.id !== user.id);
+                    }, 500);
+                  }
+              });
+            }
+          }"
+          class="w-1/5 bg-[#f9f9f9] px-4 md:px-8 lg:pr-10 py-4"
+        >
+          <h3 class="mb-2 text-xl font-extrabold">Trending</h3>
+          <p x-show="trending.length === 0" style="display: none;" class="text-sm text-gray-500 italic mb-4">No trending topics yet.</p>
+          <ul x-show="trending.length > 0" class="flex flex-col gap-2 mb-4">
+            <template x-for="tag in trending" :key="tag.name">
+              <li>
+                <button @click="$dispatch('hashtag-triggered', tag.name)" class="text-left hover:underline">
+                  #<span x-text="tag.name"></span> 
+                  <span class="text-xs block text-gray-500" x-text="`${tag.count} posts`"></span>
                 </button>
-              </div>
-            </li>
-          </template>
-        </ul>
-      </div>
+              </li>
+            </template>
+          </ul>
+          
+          <h3 class="mb-4 text-xl font-extrabold">Suggestions</h3>
+          <p x-show="suggestions.length === 0" style="display: none;" class="text-sm text-gray-500 italic">No users have posted yet.</p>
+          <ul x-show="suggestions.length > 0">
+            <template x-for="user in suggestions" :key="user.id">
+              <li class="mb-4">
+                <div class="flex items-center gap-2">
+                  <a :href="'/profile/' + user.username + '/'" class="shrink-0">
+                    <img
+                      class="w-10 h-10 rounded-full border border-gray-500 object-cover object-[center_2px] hover:opacity-80 transition"
+                      :src="user.avatar"
+                      alt="avatar"
+                    />
+                  </a>
+                  <div class="flex-1 overflow-hidden">
+                    <a :href="'/profile/' + user.username + '/'" class="font-bold truncate hover:underline block" x-text="user.display_name"></a>
+                    <a :href="'/profile/' + user.username + '/'" class="text-xs text-gray-400 truncate hover:text-gray-600 block" x-text="`@${user.username}`"></a>
+                  </div>
+                  <button 
+                    @click="toggleFollow(user)"
+                    class="px-4 py-1.5 rounded-full text-xs font-bold transition shadow-sm shrink-0"
+                    :class="user.is_following ? 'bg-gray-200 text-black' : 'bg-gray-900 text-white hover:bg-black'"
+                    x-text="user.is_following ? 'Following' : 'Follow'">
+                  </button>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </div>
     </div>
   </body>
 </html>

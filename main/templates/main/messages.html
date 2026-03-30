@@ -2,95 +2,239 @@
 {% load static %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row h-full gap-4">
+<div x-data="messenger()" x-init="init()" class="h-[calc(100vh-120px)] flex gap-4 overflow-hidden">
 
-  <!-- Chat List (Left Panel) -->
-  <div class="w-full md:w-1/3 bg-white border border-gray-200 rounded-lg overflow-y-auto h-[80vh]">
-    <h2 class="text-xl font-bold p-4 border-b border-gray-200">Chats</h2>
-    <ul class="flex flex-col divide-y divide-gray-200">
-      <!-- Example Chat Item -->
-      <li class="flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer">
-        <img class="w-12 h-12 rounded-full object-cover" src="{% static 'main/assets/default.svg' %}" alt="avatar">
-        <div class="flex-1">
-          <p class="font-bold text-gray-800">John Doe</p>
-          <p class="text-sm text-gray-500 truncate">Hey, are you coming to the meeting?</p>
-        </div>
-        <span class="text-xs text-gray-400">2h</span>
-      </li>
-
-      <li class="flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer">
-        <img class="w-12 h-12 rounded-full object-cover" src="{% static 'main/assets/default.svg' %}" alt="avatar">
-        <div class="flex-1">
-          <p class="font-bold text-gray-800">Alice</p>
-          <p class="text-sm text-gray-500 truncate">Can you review my PR?</p>
-        </div>
-        <span class="text-xs text-gray-400">5h</span>
-      </li>
-
-      <!-- Dynamic chat list -->
-      {% for chat in chats %}
-      <li class="flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer">
-        <img class="w-12 h-12 rounded-full object-cover" src="{{ chat.user.profile_image.url|default:'{% static "main/assets/default.svg" %}' }}" alt="avatar">
-        <div class="flex-1">
-          <p class="font-bold text-gray-800">{{ chat.user.username }}</p>
-          <p class="text-sm text-gray-500 truncate">{{ chat.last_message|truncatechars:30 }}</p>
-        </div>
-        <span class="text-xs text-gray-400">{{ chat.last_message_time|timesince }} ago</span>
-      </li>
-      {% endfor %}
-
-    </ul>
-  </div>
-
-  <!-- Chat Window (Right Panel) -->
-  <div class="flex-1 flex flex-col bg-white border border-gray-200 rounded-lg h-[80vh]">
-    <div class="flex items-center p-4 border-b border-gray-200">
-      <img class="w-10 h-10 rounded-full object-cover" src="{% static 'main/assets/default.svg' %}" alt="chat avatar">
-      <p class="font-bold text-gray-800 ml-3">Chat with John Doe</p>
+  <!-- Left Side: Conversation List -->
+  <div class="w-full md:w-80 flex flex-col bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden shrink-0"
+       :class="selectedConvo ? 'hidden md:flex' : 'flex'">
+    
+    <div class="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+      <h2 class="text-xl font-bold text-gray-900 uppercase tracking-tight">Messages</h2>
+      <div x-show="loadingConversations" class="animate-spin h-4 w-4 border-2 border-gray-900 border-t-transparent rounded-full"></div>
     </div>
 
- <!-- Messages -->
-<div class="flex-1 p-4 overflow-y-auto space-y-4">
-  <!-- Example messages -->
-  <div class="flex justify-start">
-    <div class="bg-gray-200 p-3 rounded-xl max-w-xs">
-      Hey! Are you coming to the meeting today?
-    </div>
-  </div>
-  <div class="flex justify-end">
-    <div class="bg-[#6D6D6D] text-white p-3 rounded-xl max-w-xs">
-      Yes! I will join in 5 minutes.
+    <div class="flex-1 overflow-y-auto divide-y divide-gray-50">
+      <template x-for="convo in conversations" :key="convo.id">
+        <div @click="selectConversation(convo)" 
+             class="flex items-center gap-4 p-4 cursor-pointer transition hover:bg-gray-50 relative"
+             :class="selectedConvo && selectedConvo.id === convo.id ? 'bg-gray-100/80 border-r-4 border-gray-900' : ''">
+          
+          <img :src="convo.other_user.avatar" class="w-12 h-12 rounded-full border border-gray-200 object-cover shrink-0">
+          
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between items-baseline mb-0.5">
+              <p class="font-bold text-sm text-gray-900 truncate" x-text="convo.other_user.display_name"></p>
+              <span class="text-[10px] font-bold text-gray-400 capitalize" x-text="formatTime(convo.last_message_time)"></span>
+            </div>
+            <p class="text-xs text-gray-500 truncate font-medium" x-text="convo.last_message || 'Start a conversation...'"></p>
+          </div>
+        </div>
+      </template>
+
+      <!-- Empty Conversations State -->
+      <div x-show="!loadingConversations && conversations.length === 0" class="p-12 text-center">
+        <p class="text-gray-400 font-bold text-sm">No chats found.</p>
+      </div>
     </div>
   </div>
 
-  <!-- Dynamic messages -->
-  {% for msg in messages %}
-    {% if msg.sender == request.user %}
-      <div class="flex justify-end">
-        <div class="bg-[#6D6D6D] text-white p-3 rounded-xl max-w-xs">
-          {{ msg.content }}
+  <!-- Right Side: Chat Window -->
+  <div class="flex-1 flex flex-col bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden relative"
+       :class="!selectedConvo ? 'hidden md:flex' : 'flex'">
+    
+    <template x-if="!selectedConvo">
+      <div class="flex-1 flex flex-col items-center justify-center text-center p-12 bg-gray-50/30">
+        <div class="w-20 h-20 bg-white rounded-full shadow-sm flex items-center justify-center mb-6 border border-gray-100">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Select a Conversation</h3>
+        <p class="text-gray-500 font-medium max-w-xs">Pick an existing chat or visit a profile to start a new thread.</p>
+      </div>
+    </template>
+
+    <template x-if="selectedConvo">
+      <div class="flex-1 flex flex-col min-h-0">
+        <!-- Chat Header -->
+        <div class="p-4 border-b border-gray-100 flex items-center gap-4 bg-white z-10 shadow-sm/50">
+          <button @click="selectedConvo = null" class="md:hidden p-2 text-gray-400 hover:text-black">
+             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          
+          <img :src="selectedConvo.other_user.avatar" class="w-10 h-10 rounded-full border border-gray-200 object-cover">
+          <div class="flex-1">
+             <p class="font-bold text-gray-900 leading-tight" x-text="selectedConvo.other_user.display_name"></p>
+             <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest" x-text="'@' + selectedConvo.other_user.username"></p>
+          </div>
+        </div>
+
+        <!-- Chat Messages Area -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/10" id="message-container" x-ref="msgContainer">
+          <template x-for="(msg, idx) in messages" :key="idx">
+             <div class="flex w-full" :class="msg.sender === currentUser ? 'justify-end' : 'justify-start'">
+                <div class="flex flex-col max-w-[80%] md:max-w-[70%]">
+                    <div class="px-4 py-2.5 rounded-2xl text-sm font-medium shadow-sm"
+                         :class="msg.sender === currentUser ? 'bg-gray-900 text-white rounded-br-none' : 'bg-white border border-gray-100 text-gray-800 rounded-bl-none'">
+                       <p class="whitespace-pre-wrap" x-text="msg.content"></p>
+                    </div>
+                </div>
+             </div>
+          </template>
+          
+          <div x-show="loadingMessages" class="flex justify-center py-4">
+             <div class="animate-pulse flex space-x-2">
+                <div class="h-2 w-2 bg-gray-300 rounded-full"></div>
+                <div class="h-2 w-2 bg-gray-300 rounded-full"></div>
+                <div class="h-2 w-2 bg-gray-300 rounded-full"></div>
+             </div>
+          </div>
+        </div>
+
+        <!-- Message Input -->
+        <div class="p-6 border-t border-gray-100 bg-white">
+          <form @submit.prevent="sendMessage()" class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-2xl p-2 focus-within:ring-2 focus-within:ring-gray-900 focus-within:bg-white transition-all">
+             <textarea 
+                x-model="newMessage" 
+                @keydown.enter.prevent="sendMessage()"
+                class="flex-1 bg-transparent border-none focus:ring-0 px-3 py-2 text-sm font-medium resize-none h-10 scrollbar-hide" 
+                placeholder="Write a message..."></textarea>
+             
+             <button type="submit" 
+                     :disabled="!newMessage.trim()"
+                     class="p-2.5 bg-gray-900 text-white rounded-xl hover:bg-black transition-all disabled:opacity-30 disabled:scale-95 shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+             </button>
+          </form>
         </div>
       </div>
-    {% else %}
-      <div class="flex justify-start">
-        <div class="bg-gray-200 text-gray-800 p-3 rounded-xl max-w-xs">
-          {{ msg.content }}
-        </div>
-      </div>
-    {% endif %}
-  {% endfor %}
-</div>  
-
-    <!-- Message Input -->
-    <form method="POST" class="p-4 border-t border-gray-200 flex gap-2">
-      {% csrf_token %}
-      <input type="text" name="message" placeholder="Type a message..." class="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:border-gray-600">
-      <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded-full hover:bg-gray-900 transition">
-        Send
-      </button>
-    </form>
-
+    </template>
   </div>
 
 </div>
+
+<script>
+function messenger() {
+  return {
+    conversations: [],
+    messages: [],
+    selectedConvo: null,
+    loadingConversations: true,
+    loadingMessages: false,
+    newMessage: '',
+    currentUser: '{{ user.username }}',
+    pollInterval: null,
+    
+    init() {
+      this.fetchConversations();
+      
+      const params = new URLSearchParams(window.location.search);
+      const convoId = params.get('c');
+      if (convoId) {
+          this.$watch('loadingConversations', (val) => {
+              if (!val) {
+                  const target = this.conversations.find(c => c.id == convoId);
+                  if (target) this.selectConversation(target);
+              }
+          });
+      }
+
+      window.addEventListener('beforeunload', () => {
+          if (this.pollInterval) clearInterval(this.pollInterval);
+      });
+    },
+
+    fetchConversations() {
+      this.loadingConversations = true;
+      fetch('{% url "api_conversations" %}')
+        .then(r => r.json())
+        .then(data => {
+          this.conversations = data.conversations;
+        })
+        .finally(() => {
+          this.loadingConversations = false;
+        });
+    },
+
+    selectConversation(convo) {
+      if (this.pollInterval) clearInterval(this.pollInterval);
+      this.selectedConvo = convo;
+      this.messages = [];
+      this.fetchMessages();
+      
+      const newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?c=' + convo.id;
+      window.history.pushState({path:newurl},'',newurl);
+
+      this.pollInterval = setInterval(() => this.fetchMessages(true), 5000);
+    },
+
+    fetchMessages(isPolling = false) {
+      if (!this.selectedConvo) return;
+      if (!isPolling) this.loadingMessages = true;
+      
+      fetch(`/api/messages/${this.selectedConvo.id}/`)
+        .then(r => r.json())
+        .then(data => {
+            const hasNew = data.messages.length > this.messages.length;
+            this.messages = data.messages;
+            if (hasNew) this.scrollToBottom();
+        })
+        .finally(() => {
+          if (!isPolling) this.loadingMessages = false;
+        });
+    },
+
+    sendMessage() {
+      if (!this.newMessage.trim() || !this.selectedConvo) return;
+      
+      const content = this.newMessage;
+      this.newMessage = '';
+      
+      fetch(`/api/messages/${this.selectedConvo.id}/`, {
+          method: 'POST',
+          headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: content })
+      })
+      .then(r => r.json())
+      .then(data => {
+          if (data.message) {
+              this.messages.push(data.message);
+              this.scrollToBottom();
+              this.selectedConvo.last_message = content;
+              this.selectedConvo.last_message_time = data.message.created_at;
+          }
+      });
+    },
+
+    scrollToBottom() {
+        this.$nextTick(() => {
+            const container = this.$refs.msgContainer;
+            if (container) {
+                container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            }
+        });
+    },
+
+    formatTime(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const now = new Date();
+        const diff = (now - date) / 1000;
+        
+        if (diff < 60) return 'Just now';
+        if (diff < 3600) return Math.floor(diff/60) + 'm';
+        if (diff < 86400) return Math.floor(diff/3600) + 'h';
+        return Math.floor(diff/86400) + 'd';
+    }
+  }
+}
+</script>
+
+<style>
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+</style>
 {% endblock %}

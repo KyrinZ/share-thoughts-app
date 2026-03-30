@@ -23,7 +23,6 @@
       <textarea x-model="shareQuote" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-900 resize-none h-24" placeholder="Add a quote (optional)..."></textarea>
     </div>
     
-    <!-- Mini Preview of the post being shared -->
     <template x-if="postToShare">
       <div class="p-3 border border-gray-200 rounded-lg mb-4 bg-gray-50 flex items-start gap-3">
         <img :src="postToShare.original_post ? postToShare.original_post.author.avatar : postToShare.author.avatar" class="w-8 h-8 rounded-full border border-gray-300 object-cover">
@@ -57,7 +56,6 @@
       rows="2"
     ></textarea>
     
-    <!-- Media Preview -->
     <div x-show="postMedia.length > 0" class="flex gap-2 overflow-x-auto mb-2 py-2">
        <template x-for="(src, idx) in postMedia" :key="idx">
           <img :src="src" class="h-20 w-20 object-cover rounded border border-gray-300">
@@ -84,9 +82,7 @@
 </form>
 {% endif %}
 
-<!-- FEED RENDERING -->
 <div class="flex flex-col gap-4 mt-4 relative min-h-[200px]">
-  <!-- Loading Spinner -->
   <div x-show="loading" class="absolute inset-0 flex items-start justify-center pt-10 bg-transparent z-10 transition">
      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
   </div>
@@ -101,19 +97,23 @@
     <div class="bg-[#f4f4f4] rounded-md shadow-sm border border-gray-200 relative">
       <!-- Header -->
       <div class="flex items-center gap-4 p-4">
-        <img
-          class="w-10 h-10 rounded-full border border-gray-500 object-cover object-[center_2px]"
-          :src="post.author.avatar"
-          alt="avatar"
-        />
-        <p class="font-semibold">
-          <span x-text="post.author.display_name"></span>
-          <span class="text-xs text-gray-500 ml-1">
-             posted <span x-text="timeSince(post.created_at)"></span>
-             <span x-show="post.is_edited" class="italic">(edited)</span>
-          </span>
-          <span class="text-sm block text-gray-500" x-text="`@${post.author.username}`"></span>
-        </p>
+        <a :href="'/profile/' + post.author.username + '/'" class="shrink-0">
+          <img
+            class="w-10 h-10 rounded-full border border-gray-500 object-cover object-[center_2px] hover:opacity-80 transition"
+            :src="post.author.avatar"
+            alt="avatar"
+          />
+        </a>
+        <div class="flex-1">
+          <p class="font-semibold">
+            <a :href="'/profile/' + post.author.username + '/'" class="hover:underline" x-text="post.author.display_name"></a>
+            <span class="text-xs text-gray-500 ml-1 font-normal">
+               posted <span x-text="timeSince(post.created_at)"></span>
+               <span x-show="post.is_edited" class="italic">(edited)</span>
+            </span>
+          </p>
+          <a :href="'/profile/' + post.author.username + '/'" class="text-sm block text-gray-500 hover:text-gray-700" x-text="`@${post.author.username}`"></a>
+        </div>
 
         <!-- Post Options Matrix -->
         <div class="ml-auto relative" x-show="post.author.username === currentUser">
@@ -127,13 +127,11 @@
         </div>
       </div>
 
-      <!-- General Post Content -->
       <div class="px-6 mb-4">
         <div x-show="!post.isEditing">
           <p class="whitespace-pre-wrap text-gray-900" x-text="post.content"></p>
         </div>
         
-        <!-- Post Edit Field -->
         <div x-show="post.isEditing" class="flex flex-col gap-2" style="display:none;">
            <textarea x-model="post.editContent" class="w-full p-2 border border-gray-300 rounded bg-white whitespace-pre-wrap focus:outline-none"></textarea>
            <div class="flex justify-end gap-2 mt-1">
@@ -142,12 +140,13 @@
            </div>
         </div>
 
-        <!-- Quote Share Visualization -->
         <template x-if="post.original_post">
           <div class="mt-4 border border-gray-300 rounded-lg p-4 bg-white/70">
              <div class="flex items-center gap-2 mb-2">
-                 <img :src="post.original_post.author.avatar" class="w-6 h-6 rounded-full border border-gray-400 object-cover">
-                 <span class="font-bold text-sm" x-text="post.original_post.author.display_name"></span>
+                 <a :href="'/profile/' + post.original_post.author.username + '/'">
+                    <img :src="post.original_post.author.avatar" class="w-6 h-6 rounded-full border border-gray-400 object-cover hover:opacity-80 transition">
+                 </a>
+                 <a :href="'/profile/' + post.original_post.author.username + '/'" class="font-bold text-sm hover:underline" x-text="post.original_post.author.display_name"></a>
                  <span class="text-xs text-gray-500" x-text="`@${post.original_post.author.username} · ${timeSince(post.original_post.created_at)}`"></span>
              </div>
              <p class="whitespace-pre-wrap text-sm text-gray-800" x-text="post.original_post.content"></p>
@@ -161,7 +160,6 @@
           </div>
         </template>
 
-        <!-- Media Display Gallery -->
         <template x-if="post.media && post.media.length > 0">
            <div class="flex gap-2 overflow-x-auto mt-4 py-2">
               <template x-for="img in post.media">
@@ -171,7 +169,6 @@
         </template>
       </div>
 
-      <!-- Action Panel -->
       <div class="flex items-center gap-4 px-4 mb-4 select-none">
         <button @click="toggleLike(post)" class="flex items-center gap-1 text-sm transition font-medium" :class="post.user_liked ? 'text-red-500 font-bold' : 'text-gray-600 hover:text-black'">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 transition duration-200" :class="post.user_liked ? 'fill-current text-red-500 stroke-red-500 scale-110' : 'text-gray-900 opacity-70'">
@@ -194,21 +191,24 @@
         </p>
       </div>
 
-      <!-- Comments Segment -->
       <div x-show="post.showComments" style="display: none;" class="border-t border-gray-200">
         <div class="max-h-96 overflow-y-auto">
           <template x-for="cmt in post.comments" :key="cmt.id">
             <div class="px-4 border-b border-gray-100 last:border-0 hover:bg-black/5 transition">
               <div class="flex items-center gap-2 pt-4 pb-2">
-                <img
-                  class="w-8 h-8 rounded-full border border-gray-400 object-cover object-[center_2px]"
-                  :src="cmt.author.avatar"
-                  alt="logo"
-                />
-                <p class="font-semibold text-sm">
-                  <span x-text="cmt.author.display_name"></span>
-                  <span class="text-xs font-normal text-gray-500 ml-1" x-text="`@${cmt.author.username}`"></span>
-                </p>
+                <a :href="'/profile/' + cmt.author.username + '/'">
+                  <img
+                    class="w-8 h-8 rounded-full border border-gray-400 object-cover object-[center_2px] hover:opacity-80 transition"
+                    :src="cmt.author.avatar"
+                    alt="logo"
+                  />
+                </a>
+                <div class="flex-1">
+                  <p class="font-semibold text-sm">
+                    <a :href="'/profile/' + cmt.author.username + '/'" class="hover:underline" x-text="cmt.author.display_name"></a>
+                    <span class="text-xs font-normal text-gray-500 ml-1" x-text="`@${cmt.author.username}`"></span>
+                  </p>
+                </div>
 
                 <div class="ml-auto flex items-center gap-2 relative" >
                   <span x-show="cmt.is_edited" class="text-[10px] font-semibold text-gray-400 bg-gray-100 px-1 rounded uppercase tracking-wider">edited</span>
@@ -228,12 +228,9 @@
                 </div>
               </div>
 
-              <!-- Sub-content -->
               <div class="px-[40px] pb-4">
                  <div x-show="!cmt.isEditing">
                     <p class="text-sm whitespace-pre-wrap text-gray-800" x-text="cmt.content"></p>
-                    
-                    <!-- Comment Actions Panel -->
                     <div class="flex items-center gap-4 mt-2">
                       <button @click="toggleCommentLike(post, cmt)" class="flex items-center gap-1 text-xs font-medium transition" :class="cmt.user_liked ? 'text-red-500' : 'text-gray-500 hover:text-black'">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 transition duration-200" :class="cmt.user_liked ? 'fill-current stroke-red-500 scale-110' : ''">
@@ -257,7 +254,6 @@
           </template>
         </div>
 
-        <!-- Submission Ribbon -->
         <form @submit.prevent="submitComment(post)" class="p-4 w-full flex gap-3 bg-gray-50 border-t border-gray-200 items-start">
           <img
             class="w-8 h-8 rounded-full border border-gray-400 object-cover object-[center_2px]"

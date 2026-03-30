@@ -2,86 +2,367 @@
 {% load static %}
 
 {% block content %}
-
-<!-- Profile Header Section -->
-<div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
-
-  <!-- Background / Cover Image -->
-  <div class="relative h-40 w-full bg-gray-200">
-    {% if user.profile.cover_image %}
-      <img src="{{ user.profile.cover_image.url }}" class="w-full h-full object-cover" alt="Cover Image">
-    {% endif %}
-
-    <!-- Edit cover button -->
-    {% if request.user == user %}
-      <form method="POST" enctype="multipart/form-data" class="absolute top-2 right-2">
-        {% csrf_token %}
-        <input type="file" name="cover_image" class="hidden" id="coverImageInput">
-        <label for="coverImageInput" class="px-3 py-1 bg-gray-800 text-white rounded cursor-pointer text-sm">
-          Edit Cover
-        </label>
-      </form>
-    {% endif %}
-  </div>
-
-  <!-- Profile Info -->
-  <div class="flex flex-col md:flex-row items-center gap-6 px-6 py-4 -mt-12">
+<div x-data="{ 
+    showEditModal: false, 
+    showPasswordModal: false,
+    profileDisplayName: '{{ profile_user.profile.display_name|default:profile_user.username }}',
+    profileBio: '{{ profile_user.profile.bio|default:'' }}',
+    following: {{ is_following|yesno:'true,false' }},
+    followersCount: {{ followers_count }},
     
-    <!-- Profile Image -->
-    <div class="relative">
-      <img src="{{ user.profile.profile_image.url|default:'{% static "main/assets/default.svg" %}' }}" 
-           class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white object-cover" 
-           alt="Profile Image">
-      {% if request.user == user %}
-        <form method="POST" enctype="multipart/form-data" class="absolute bottom-0 right-0">
+    toggleFollow() {
+        if (!'{{ request.user.is_authenticated|yesno:'true,' }}') {
+            window.location.href = '{% url 'login' %}';
+            return;
+        }
+        fetch('{% url 'api_toggle_follow' profile_user.id %}', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        }).then(r => r.json()).then(data => {
+            this.following = data.following;
+            this.followersCount = data.followers_count;
+        });
+    },
+
+    startChat() {
+        fetch('{% url 'api_start_conversation' profile_user.id %}', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        }).then(r => r.json()).then(data => {
+            window.location.href = '{% url 'messages' %}?c=' + data.id;
+        });
+    }
+}">
+
+  <!-- Profile Header Section -->
+  <div class="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6 shadow-sm">
+
+
+    <div class="relative h-48 w-full bg-gray-200">
+      {% if profile_user.profile.cover %}
+        <img src="{{ profile_user.profile.cover.url }}" class="w-full h-full object-cover" alt="Cover Image">
+      {% else %}
+        <div class="w-full h-full bg-gradient-to-r from-gray-300 to-gray-400"></div>
+      {% endif %}
+
+      <!-- Edit cover button -->
+      {% if request.user == profile_user %}
+        <form action="{% url 'profile' %}" method="POST" enctype="multipart/form-data" class="absolute top-4 right-4 text-xs font-semibold">
           {% csrf_token %}
-          <input type="file" name="profile_image" class="hidden" id="profileImageInput">
-          <label for="profileImageInput" class="px-2 py-1 bg-gray-800 text-white rounded-full cursor-pointer text-xs">
-            Edit
+          <input type="hidden" name="action" value="update_profile">
+          <input type="file" name="cover" class="hidden" id="coverImageInput" @change="$el.form.submit()">
+          <label for="coverImageInput" class="px-4 py-2 bg-black/50 backdrop-blur-md text-white rounded-full cursor-pointer hover:bg-black transition flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Edit Cover
           </label>
         </form>
       {% endif %}
     </div>
 
-    <!-- Username / Display Name / Bio -->
-    <div class="flex-1">
-      <div class="flex items-center gap-4">
-        <h2 class="text-2xl font-bold text-gray-900">{{ user.username }}</h2>
-        {% if request.user == user %}
-          <button class="px-3 py-1 border border-gray-400 rounded hover:bg-gray-100 text-sm">Edit Profile</button>
-        {% endif %}
-      </div>
-      <p class="text-gray-600 font-medium">{{ user.profile.display_name }}</p>
-      <p class="text-gray-500 mt-1">{{ user.profile.bio }}</p>
+    <!-- Profile Info -->
+    <div class="px-6 pb-6 mt-[-64px] relative z-10">
+      <div class="flex flex-col md:flex-row items-end gap-6">
+        
+        <!-- Profile Image -->
+        <div class="relative shrink-0">
+          <img src="{% if profile_user.profile.avatar %}{{ profile_user.profile.avatar.url }}{% else %}{% static 'main/assets/default.svg' %}{% endif %}" 
+               class="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-white object-cover shadow-md bg-white" 
+               alt="Profile Image">
+          {% if request.user == profile_user %}
+            <form action="{% url 'profile' %}" method="POST" enctype="multipart/form-data" class="absolute bottom-1 right-1">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="update_profile">
+              <input type="file" name="avatar" class="hidden" id="profileImageInput" @change="$el.form.submit()">
+              <label for="profileImageInput" class="p-2 bg-gray-900 text-white rounded-full cursor-pointer hover:bg-black transition shadow-lg flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </label>
+            </form>
+          {% endif %}
+        </div>
 
-      <!-- Followers / Following -->
-      <div class="flex gap-6 mt-3">
-        <a href="{% url 'followers' user.id %}" class="text-gray-700 font-semibold hover:underline">
-          {{ user.profile.followers_count }} Followers
-        </a>
-        <a href="{% url 'following' user.id %}" class="text-gray-700 font-semibold hover:underline">
-          {{ user.profile.following_count }} Following
-        </a>
+        <!-- Identity & Actions -->
+        <div class="flex-1 mb-2">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 class="text-3xl font-bold text-gray-900 leading-tight">{{ profile_user.profile.display_name|default:profile_user.username }}</h2>
+              <p class="text-gray-500 font-semibold">@{{ profile_user.username }}</p>
+            </div>
+
+            <div class="flex gap-2">
+              {% if request.user == profile_user %}
+                <button @click="showEditModal = true" class="px-6 py-2 bg-gray-900 text-white rounded-full font-bold hover:bg-black transition shadow-sm text-sm">
+                  Edit Profile
+                </button>
+                <button @click="showPasswordModal = true" class="px-6 py-2 border border-gray-300 bg-white text-gray-700 rounded-full font-bold hover:bg-gray-50 transition shadow-sm text-sm">
+                  Security
+                </button>
+              {% else %}
+                <button @click="toggleFollow" 
+                        class="px-8 py-2 rounded-full font-bold transition shadow-sm"
+                        :class="following ? 'bg-gray-200 text-black hover:bg-red-100 hover:text-red-600 hover:border-red-200' : 'bg-gray-900 text-white hover:bg-black'"
+                        x-text="following ? 'Following' : 'Follow'">
+                </button>
+                {% if user.is_authenticated %}
+                <button @click="startChat" class="p-2 border border-gray-300 rounded-full hover:bg-gray-100 transition shadow-sm bg-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </button>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bio and Stats -->
+      <div class="mt-6 max-w-2xl">
+        <p class="text-gray-800 leading-relaxed font-medium">{% if profile_user.profile.bio %}{{ profile_user.profile.bio|linebreaksbr }}{% else %}No bio yet.{% endif %}</p>
+        
+        <div class="flex gap-8 mt-5 border-t border-gray-100 pt-5">
+          <a href="{% url 'followers' profile_user.username %}" class="flex flex-col hover:opacity-75 transition">
+             <span class="text-xl font-bold text-gray-900" x-text="followersCount"></span>
+             <span class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Followers</span>
+          </a>
+          <a href="{% url 'following' profile_user.username %}" class="flex flex-col hover:opacity-75 transition">
+             <span class="text-xl font-bold text-gray-900">{{ following_count }}</span>
+             <span class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Following</span>
+          </a>
+          <div class="flex flex-col">
+             <span class="text-xl font-bold text-gray-900">{{ profile_user.posts.count }}</span>
+             <span class="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">Thoughts</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- User Posts -->
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-  {% for post in posts %}
-    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition">
-      {% if post.image %}
-        <img src="{{ post.image.url }}" class="w-full h-48 object-cover" alt="Post Image">
+  <!-- Messages / Feedback -->
+  {% if messages %}
+  <div class="mb-6 space-y-2">
+    {% for message in messages %}
+      {% if 'profile_msg' in message.tags %}
+      <div class="p-4 rounded-xl text-sm border font-bold flex items-center justify-between shadow-sm {% if 'error' in message.tags %}bg-red-50 border-red-200 text-red-800{% else %}bg-green-50 border-green-200 text-green-800{% endif %}">
+        <span>{{ message }}</span>
+        <button class="text-current opacity-40 hover:opacity-100 transition" @click="$el.parentElement.remove()">✕</button>
+      </div>
       {% endif %}
-      <div class="p-2">
-        <p class="text-gray-800 text-sm truncate">{{ post.caption }}</p>
-        <span class="text-gray-400 text-xs">{{ post.created_at|timesince }} ago</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- User Posts Feed -->
+  <div class="mt-10">
+    <div class="flex items-center gap-4 mb-8">
+      <h3 class="text-xl font-bold text-gray-900 uppercase tracking-tight">Recent Thoughts</h3>
+      <div class="h-0.5 bg-gray-100 flex-1"></div>
+    </div>
+    
+    <div x-data="profilePostFeed('{{ profile_user.username }}', '{{ user.username|default:'' }}')" x-init="init()">
+      <div x-show="loading" class="flex justify-center py-20">
+         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+
+      <!-- Empty State -->
+      <div x-show="!loading && posts.length === 0" style="display: none;" class="text-center py-24 bg-white border border-gray-200 rounded-2xl shadow-sm">
+         <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+         </div>
+         <p class="text-gray-900 font-bold text-2xl mb-2">No thoughts yet</p>
+         <p class="text-gray-500 font-medium">When @{{ profile_user.username }} shares something, it will show up here.</p>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        <template x-for="post in posts" :key="post.id">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden transition-all hover:shadow-md hover:border-gray-300 relative">
+                <div class="flex items-center gap-3 p-4">
+                  <img :src="post.author.avatar" class="w-10 h-10 rounded-full border border-gray-100 object-cover">
+                  <div>
+                    <p class="font-bold text-gray-900 text-sm" x-text="post.author.display_name"></p>
+                    <p class="text-[11px] text-gray-400 font-semibold uppercase tracking-tighter" x-text="`@${post.author.username} · ${timeSince(post.created_at)}`"></p>
+                  </div>
+
+                  </div>
+ 
+                  <div class="ml-auto relative" x-show="post.author.username === currentUser">
+                    <button @click="post.showOptions = !post.showOptions">
+                      <img class="w-6 h-6 opacity-30 hover:opacity-100" src="{% static 'main/assets/ellipsis.svg' %}" alt="logo" />
+                    </button>
+                    <div x-show="post.showOptions" @click.away="post.showOptions = false" class="absolute right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl w-32 overflow-hidden z-20" style="display:none;">
+                       <button @click="post.isEditing = true; post.showOptions = false" class="w-full text-left px-4 py-2.5 hover:bg-gray-50 text-xs font-bold text-gray-700">Edit</button>
+                       <button @click="deletePost(post.id)" class="w-full text-left px-4 py-2.5 hover:bg-black hover:text-white transition-colors text-xs font-bold">Delete</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="px-5 pb-5">
+                    <div x-show="!post.isEditing">
+                        <p class="whitespace-pre-wrap text-gray-800 leading-relaxed font-medium" x-text="post.content"></p>
+                    </div>
+
+                    <div x-show="post.isEditing" class="flex flex-col gap-2" style="display:none;">
+                      <textarea x-model="post.editContent" class="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 whitespace-pre-wrap focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition text-sm font-medium"></textarea>
+                      <div class="flex justify-end gap-2 mt-1">
+                          <button @click="post.isEditing = false" class="px-4 py-1.5 border-2 border-gray-100 font-bold rounded-full hover:bg-gray-50 text-[10px] uppercase tracking-wider text-gray-500">Cancel</button>
+                          <button @click="savePostEdit(post)" class="px-4 py-1.5 bg-gray-900 font-bold text-white rounded-full hover:bg-black text-[10px] uppercase tracking-wider shadow-md">Save</button>
+                      </div>
+                    </div>
+
+                    <template x-if="post.media && post.media.length > 0">
+                        <div class="flex gap-2 overflow-x-auto mt-4 scrollbar-hide py-1">
+                            <template x-for="m in post.media">
+                                <img :src="m.url" class="h-72 rounded-xl object-cover border border-gray-100 shadow-sm">
+                            </template>
+                        </div>
+                    </template>
+                </div>
+                <div class="px-5 py-3 bg-gray-50/30 border-t border-gray-100 flex gap-8">
+                    <div class="flex items-center gap-1.5 text-xs font-extrabold text-gray-500">
+                        <svg class="w-5 h-5 stroke-[2.5]" :class="post.user_liked ? 'fill-red-500 stroke-red-500' : 'stroke-gray-400'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                        <span x-text="post.likes_count"></span>
+                    </div>
+                </div>
+            </div>
+        </template>
       </div>
     </div>
-  {% empty %}
-    <p class="text-gray-500 col-span-full text-center mt-6">No posts yet.</p>
-  {% endfor %}
+  </div>
+
+  <!-- MODALS -->
+  <!-- Edit Profile Modal -->
+  <div x-show="showEditModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md px-4" @click.self="showEditModal = false">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden">
+      <div class="p-8 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="text-2xl font-bold">Edit Profile</h3>
+        <button @click="showEditModal = false" class="text-gray-400 hover:text-black transition">✕</button>
+      </div>
+      <form action="{% url 'profile' %}" method="POST" class="p-8 space-y-8">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_profile">
+        
+        <div class="space-y-2">
+          <label class="block text-xs font-extrabold text-gray-400 uppercase tracking-widest">Display Name</label>
+          <input type="text" name="display_name" x-model="profileDisplayName" class="w-full border border-gray-200 rounded-2xl px-5 py-4 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition font-bold" placeholder="Public name">
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-extrabold text-gray-400 uppercase tracking-widest">Bio</label>
+          <textarea name="bio" x-model="profileBio" rows="4" class="w-full border border-gray-200 rounded-2xl px-5 py-4 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition resize-none font-medium h-32" placeholder="Tell us something..."></textarea>
+        </div>
+
+        <div class="flex gap-4 pt-4">
+          <button type="button" @click="showEditModal = false" class="flex-1 px-8 py-4 border-2 border-gray-100 rounded-2xl font-bold hover:bg-gray-50 transition text-gray-600">Dismiss</button>
+          <button type="submit" class="flex-1 px-8 py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black transition shadow-xl">Apply Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Change Password Modal -->
+  <div x-show="showPasswordModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md px-4" @click.self="showPasswordModal = false">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="p-8 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="text-2xl font-bold">Security</h3>
+        <button @click="showPasswordModal = false" class="text-gray-400 hover:text-black transition">✕</button>
+      </div>
+      <form action="{% url 'profile' %}" method="POST" class="p-8 space-y-8">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="change_password">
+        
+        <div class="space-y-2">
+          <label class="block text-xs font-extrabold text-gray-400 uppercase tracking-widest">Current Password</label>
+          <input type="password" name="old_password" required class="w-full border border-gray-200 rounded-2xl px-5 py-4 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition">
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-extrabold text-gray-400 uppercase tracking-widest">New Password</label>
+          <input type="password" name="new_password" required class="w-full border border-gray-200 rounded-2xl px-5 py-4 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:bg-white transition">
+        </div>
+
+        <div class="flex gap-4 pt-4">
+          <button type="button" @click="showPasswordModal = false" class="flex-1 px-8 py-4 border-2 border-gray-100 rounded-2xl font-bold hover:bg-gray-50 transition text-gray-600">Dismiss</button>
+          <button type="submit" class="flex-1 px-8 py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-black transition shadow-xl">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </div>
 
+<script>
+function profilePostFeed(author, currentUser) {
+  return {
+    posts: [],
+    loading: true,
+    author: author,
+    currentUser: currentUser,
+    
+    init() {
+      this.fetchPosts();
+    },
+    
+    fetchPosts() {
+      this.loading = true;
+      let url = `/api/posts/?author=${encodeURIComponent(this.author)}`;
+      
+      fetch(url)
+        .then(r => r.json())
+        .then(data => {
+          this.posts = data.posts.map(p => ({
+            ...p,
+            showOptions: false,
+            editContent: p.content,
+            isEditing: false
+          }));
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+
+    deletePost(postId) {
+      if(!confirm("Are you sure?")) return;
+      let fd = new FormData(); fd.append('action', 'delete');
+      fetch(`/api/posts/${postId}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        body: fd
+      }).then(r => {
+        if(r.ok) this.posts = this.posts.filter(p => p.id !== postId);
+      });
+    },
+    
+    savePostEdit(post) {
+       let fd = new FormData(); 
+       fd.append('action', 'edit');
+       fd.append('content', post.editContent);
+       fetch(`/api/posts/${post.id}/`, {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+        body: fd
+      }).then(r => r.json()).then(d => {
+        if(d.post) {
+          post.content = d.post.content;
+          post.is_edited = true;
+          post.isEditing = false;
+        }
+      });
+    },
+
+    timeSince(dateString) {
+      const date = new Date(dateString);
+      const seconds = Math.floor((new Date() - date) / 1000);
+      let interval = seconds / 31536000;
+      if (interval > 1) return Math.floor(interval) + "y ago";
+      interval = seconds / 2592000;
+      if (interval > 1) return Math.floor(interval) + "mo ago";
+      interval = seconds / 86400;
+      if (interval > 1) return Math.floor(interval) + "d ago";
+      interval = seconds / 3600;
+      if (interval > 1) return Math.floor(interval) + "h ago";
+      interval = seconds / 60;
+      if (interval > 1) return Math.floor(interval) + "m ago";
+      return "Just now";
+    }
+  }
+}
+</script>
 {% endblock %}

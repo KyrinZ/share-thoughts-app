@@ -1,0 +1,44 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <div class="flex items-center gap-4 mb-8">
+    <a href="{% url 'profile_detail' target_user.username %}" class="text-gray-400 hover:text-black transition">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </a>
+    <h2 class="text-2xl font-bold text-gray-900">{{ title }}</h2>
+    <span class="text-gray-400 font-semibold">@{{ target_user.username }}</span>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100 overflow-hidden shadow-sm">
+    {% for u in users %}
+      <div class="flex items-center justify-between p-4 hover:bg-gray-50 transition">
+        <a href="{% url 'profile_detail' u.username %}" class="flex items-center gap-4 group">
+          <img src="{% if u.profile.avatar %}{{ u.profile.avatar.url }}{% else %}{% static 'main/assets/default.svg' %}{% endif %}" 
+               class="w-12 h-12 rounded-full border border-gray-200 object-cover group-hover:scale-105 transition shadow-sm">
+          <div>
+            <p class="font-bold text-gray-900 group-hover:underline">{{ u.profile.display_name|default:u.username }}</p>
+            <p class="text-xs text-gray-500 font-semibold uppercase tracking-tight">@{{ u.username }}</p>
+          </div>
+        </a>
+        
+        {% if request.user != u %}
+          <div x-data="{ following: false, count: 0 }" x-init="following = false"> <!-- Simple follow status logic would go here if we tracked it per list item -->
+            <a href="{% url 'profile_detail' u.username %}" class="px-5 py-2 border border-gray-300 rounded-full text-xs font-bold hover:bg-gray-100 transition">
+              View Profile
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    {% empty %}
+      <div class="p-12 text-center">
+        <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-gray-100">
+           <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <p class="text-gray-500 font-medium">No {{ title|lower }} to show yet.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

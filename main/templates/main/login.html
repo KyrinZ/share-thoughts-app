@@ -82,11 +82,11 @@
 
           <div class="flex justify-between items-center text-sm">
             <label class="flex items-center gap-2">
-              <input type="checkbox" class="border-gray-300" />
+              <input type="checkbox" name="remember_me" class="border-gray-300" />
               Remember me
             </label>
 
-            <a href="#" class="underline hover:text-black">
+            <a href="{% url 'forgot_password' %}" class="underline hover:text-black">
               Forgot password?
             </a>
           </div>
