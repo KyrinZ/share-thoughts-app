@@ -10,22 +10,38 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
+
+
+def env_bool(name, default=False):
+    return os.environ.get(name, str(default)).strip().lower() in ('1', 'true', 'yes', 'on')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-cg=--t*r-n%0z@$k*fg75*wqdx8cfb4j(^otc87w!cnz6o@#p7'
+# Falls back to an insecure dev-only key so `runserver` still works without a .env file.
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY', 'django-insecure-cg=--t*r-n%0z@$k*fg75*wqdx8cfb4j(^otc87w!cnz6o@#p7'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env_bool('DEBUG', True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -125,3 +141,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Production security settings
+# https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# Off by default so local/Docker dev over plain HTTP keeps working; set these
+# via .env when deploying behind HTTPS.
+
+SECURE_SSL_REDIRECT = env_bool('SECURE_SSL_REDIRECT', False)
+SESSION_COOKIE_SECURE = env_bool('SESSION_COOKIE_SECURE', False)
+CSRF_COOKIE_SECURE = env_bool('CSRF_COOKIE_SECURE', False)
+SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '0'))
